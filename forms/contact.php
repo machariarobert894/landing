@@ -15,6 +15,21 @@
     die( 'Unable to load the "PHP Email Form" Library!');
   }
 
+  // Allow only POST requests to avoid 405 errors
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    die('Method Not Allowed');
+  }
+  
+  // Basic validation: ensure required fields are present and non-empty
+  $required_fields = ['name', 'email', 'subject', 'message'];
+  foreach ($required_fields as $field) {
+    if (!isset($_POST[$field]) || empty(trim($_POST[$field]))) {
+      http_response_code(400);
+      die('Missing or empty field: ' . $field);
+    }
+  }
+  
   $contact = new PHP_Email_Form;
   $contact->ajax = true;
   
@@ -27,13 +42,13 @@
   );
 
   $contact->to = $receiving_email_address;
-  $contact->from_name = $_POST['name'];
-  $contact->from_email = $_POST['email'];
-  $contact->subject = $_POST['subject'];
+  $contact->from_name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+  $contact->from_email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+  $contact->subject = filter_var($_POST['subject'], FILTER_SANITIZE_STRING);
 
-  $contact->add_message( $_POST['name'], 'From');
-  $contact->add_message( $_POST['email'], 'Email');
-  $contact->add_message( $_POST['message'], 'Message', 10);
+  $contact->add_message($contact->from_name, 'From');
+  $contact->add_message($contact->from_email, 'Email');
+  $contact->add_message(filter_var($_POST['message'], FILTER_SANITIZE_STRING), 'Message', 10);
 
   echo $contact->send();
 ?>
