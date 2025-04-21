@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - DerivLite</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="https://image.freepik.com/free-vector/logo-design-with-statistics-concept_23-2147492184.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="cookie-consent.css">
+    <link rel="stylesheet" href="blog.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Deriv<span>Lite</span></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="index.html#services">Solutions</a></li>
+                    <li class="dropdown">
+                        <a href="#markets">Markets <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#">Equities</a>
+                            <a href="#">Commodities</a>
+                            <a href="#">Currencies</a>
+                            <a href="#">Interest Rates</a>
+                        </div>
+                    </li>
+                    <li><a href="blog.html" class="active">Blog</a></li>
+                    <li><a href="index.html#contact" class="btn-primary">Contact Us</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Blog Hero Section -->
+    <section id="blog-hero">
+        <div class="container">
+            <div class="blog-hero-content">
+                <span class="section-tag">Financial Insights</span>
+                <h1>DerivLite Blog</h1>
+                <p>Expert analysis, market insights, and trading strategies from our team of professionals</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Categories -->
+    <section id="blog-categories">
+        <div class="container">
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all">All</button>
+                <button class="category-tab" data-category="market-analysis">Market Analysis</button>
+                <button class="category-tab" data-category="trading-strategies">Trading Strategies</button>
+                <button class="category-tab" data-category="technology">Technology</button>
+                <button class="category-tab" data-category="education">Education</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Post -->
+    <section id="featured-post">
+        <div class="container">
+            <div class="featured-post-card">
+                <div class="featured-post-image">
+                    <img src="https://img.freepik.com/free-photo/ai-technology-microchip-background-digital-transformation-concept_53876-124669.jpg" alt="AI in Trading">
+                    <div class="featured-badge">Featured</div>
+                </div>
+                <div class="featured-post-content">
+                    <div class="post-meta">
+                        <span class="post-category">Technology</span>
+                        <span class="post-date">June 5, 2023</span>
+                    </div>
+                    <h2>The Impact of AI on Derivatives Trading</h2>
+                    <p>Artificial intelligence is revolutionizing how we approach derivatives trading, from risk assessment to execution strategies. Let's explore how these technologies are creating competitive advantages and reshaping the market landscape.</p>
+                    <a href="blog-posts/ai-impact.html" class="btn-secondary">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Posts Grid -->
+    <section id="blog-posts">
+        <div class="container">
+            <div class="posts-grid">
+                <!-- Post 1 -->
+                <div class="post-card" data-category="market-analysis">
+                    <div class="post-image">
+                        <img src="https://img.freepik.com/free-photo/financial-stock-market-graph-chart-stock-market-investment-trading-screen_9693-990.jpg" alt="Market Volatility">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Market Analysis</span>
+                            <span class="post-date">June 15, 2023</span>
+                        </div>
+                        <h3>Understanding Derivatives Market Volatility</h3>
+                        <p>Explore how recent economic indicators are affecting market volatility and what this means for derivatives traders.</p>
+                        <a href="blog-posts/market-volatility.html" class="post-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Post 2 -->
+                <div class="post-card" data-category="trading-strategies">
+                    <div class="post-image">
+                        <img src="https://img.freepik.com/free-photo/close-up-businessman-with-digital-tablet-analyzing-stock-market_53876-96133.jpg" alt="Risk Management">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Trading Strategies</span>
+                            <span class="post-date">June 10, 2023</span>
+                        </div>
+                        <h3>Risk Management Strategies for Modern Traders</h3>
+                        <p>Learn effective hedging techniques and position sizing methods to protect your trading portfolio in volatile markets.</p>
+                        <a href="blog-posts/risk-management.html" class="post-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Post 3 -->
+                <div class="post-card" data-category="education">
+                    <div class="post-image">
+                        <img src="https://img.freepik.com/free-photo/forex-charts-business-concept_53876-126757.jpg" alt="Futures Trading">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Education</span>
+                            <span class="post-date">June 3, 2023</span>
+                        </div>
+                        <h3>Futures Trading: A Comprehensive Guide for Beginners</h3>
+                        <p>Discover the fundamentals of futures contracts, how they work, and strategies to incorporate them into your trading plan.</p>
+                        <a href="blog-posts/futures-trading-guide.html" class="post-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Post 4 -->
+                <div class="post-card" data-category="technology">
+                    <div class="post-image">
+                        <img src="https://img.freepik.com/free-photo/business-data-analysis_53876-94511.jpg" alt="Big Data Analytics">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Technology</span>
+                            <span class="post-date">May 28, 2023</span>
+                        </div>
+                        <h3>Big Data Analytics in Financial Markets</h3>
+                        <p>How big data is transforming financial analysis and creating new opportunities for traders and investors alike.</p>
+                        <a href="blog-posts/big-data-analytics.html" class="post-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Post 5 -->
+                <div class="post-card" data-category="market-analysis">
+                    <div class="post-image">
+                        <img src="https://img.freepik.com/free-photo/inflation-concept-with-money-background_23-2149649456.jpg" alt="Inflation Impact">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Market Analysis</span>
+                            <span class="post-date">May 21, 2023</span>
+                        </div>
+                        <h3>Inflation and Its Impact on Derivatives Pricing</h3>
+                        <p>An in-depth analysis of how inflationary pressures affect different derivative instruments and pricing models.</p>
+                        <a href="blog-posts/inflation-impact.html" class="post-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Post 6 -->
+                <div class="post-card" data-category="trading-strategies">
+                    <div class="post-image">
+                        <img src="https://img.freepik.com/free-photo/businessman-using-digital-marketing-data_53876-94028.jpg" alt="Algorithmic Trading">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Trading Strategies</span>
+                            <span class="post-date">May 15, 2023</span>
+                        </div>
+                        <h3>Algorithmic Trading: Building Your First Strategy</h3>
+                        <p>Step-by-step guide to developing, testing and implementing your first algorithmic trading strategy using Python.</p>
+                        <a href="blog-posts/algorithmic-trading.html" class="post-link">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="blog-pagination">
+                <a href="#" class="pagination-item active">1</a>
+                <a href="#" class="pagination-item">2</a>
+                <a href="#" class="pagination-item">3</a>
+                <span class="pagination-dots">...</span>
+                <a href="#" class="pagination-item">8</a>
+                <a href="#" class="pagination-item pagination-next">Next <i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section id="blog-newsletter">
+        <div class="container">
+            <div class="newsletter-container">
+                <div class="newsletter-content">
+                    <h2>Subscribe to Our Newsletter</h2>
+                    <p>Get the latest market insights, trading strategies, and educational resources directly to your inbox.</p>
+                </div>
+                <form class="blog-newsletter-form">
+                    <div class="form-group">
+                        <input type="email" placeholder="Your email address" required>
+                        <button type="submit" class="btn-primary">Subscribe</button>
+                    </div>
+                    <div class="form-terms">
+                        <small>By subscribing, you agree to our <a href="#">Privacy Policy</a> and consent to receive updates from DerivLite.</small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Deriv<span>Lite</span></h3>
+                    <p>Your trusted partner for simplified derivatives trading and advanced financial analytics.</p>
+                    <div class="certification-badges">
+                        <img src="https://img.freepik.com/free-vector/security-concept-illustration_114360-442.jpg" alt="Security Certification">
+                        <img src="https://img.freepik.com/free-vector/iso-certified-badge-design_1017-33681.jpg" alt="ISO Certification">
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#about">About Us</a></li>
+                        <li><a href="index.html#services">Solutions</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Solutions</h4>
+                    <ul>
+                        <li><a href="#">Analytics Platform</a></li>
+                        <li><a href="#">Automated Trading</a></li>
+                        <li><a href="#">Risk Management</a></li>
+                        <li><a href="#">Training & Support</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Newsletter</h4>
+                    <p>Subscribe to our newsletter for market insights and updates</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your Email">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                    <div class="legal-links">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 DerivLite. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent" class="cookie-banner">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <i class="fas fa-cookie-bite"></i>
+                <p>We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.</p>
+            </div>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn-cookie-accept">Accept</button>
+                <button id="customize-cookies" class="btn-cookie-customize">Customize</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="cookie-consent.js"></script>
+    <script src="blog.js"></script>
+</body>
+</html>
