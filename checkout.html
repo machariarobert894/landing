@@ -108,13 +108,13 @@
                         <div class="form-section">
                             <h4>Payment Method</h4>
                             <div class="binance-pay-banner">
-                                <img src="https://public.bnbstatic.com/static/images/common/binance-pay-logo.png" alt="Binance Pay">
+                                <img src="images/binance-pay-banner.jpg" alt="Binance Pay" class="binance-banner-img">
                                 <p>Fast, secure cryptocurrency payments with zero fees</p>
                             </div>
                             <div class="payment-options">
                                 <div class="payment-option active" data-payment="binance">
                                     <div class="payment-logo">
-                                        <img src="https://public.bnbstatic.com/static/images/common/binance-logo-yellow.png" alt="Binance Pay">
+                                        <img src="images/binance-logo.png" alt="Binance Pay">
                                     </div>
                                     <div class="payment-info">
                                         <h4>Binance Pay</h4>
@@ -141,14 +141,8 @@
                             
                             <div class="crypto-support">
                                 <p>Supported cryptocurrencies:</p>
-                                <div class="crypto-icons">
-                                    <span title="Bitcoin"><i class="fab fa-bitcoin"></i></span>
-                                    <span title="Ethereum"><i class="fab fa-ethereum"></i></span>
-                                    <span title="Binance Coin">BNB</span>
-                                    <span title="USDT">USDT</span>
-                                    <span title="BUSD">BUSD</span>
-                                    <span title="USDC">USDC</span>
-                                    <span title="And more...">+10</span>
+                                <div class="crypto-icons-container">
+                                    <img src="images/crypto-icons.png" alt="Supported Cryptocurrencies" class="crypto-icons-image">
                                 </div>
                             </div>
                         </div>
@@ -187,23 +181,18 @@
                         </div>
                         <div id="payment-qr" style="display: none;">
                             <div class="binance-pay-brand">
-                                <img src="https://public.bnbstatic.com/static/images/common/binance-logo-yellow.png" alt="Binance Pay" class="binance-modal-logo">
+                                <img src="images/binance-logo.png" alt="Binance Pay" class="binance-modal-logo">
                             </div>
                             <div class="qr-code-wrapper">
-                                <img id="qr-code" src="" alt="QR Code">
+                                <img id="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=BinancePayDemo" alt="QR Code">
+                                <img src="images/qr-code-scan.png" alt="Scan with your phone" class="qr-scan-overlay">
                             </div>
                             <p>Scan the QR code with your Binance App to complete the payment</p>
-                            <div id="payment-links" class="payment-links">
-                                <!-- Links will be added dynamically -->
-                            </div>
                             <p class="countdown">Payment window expires in <span id="countdown">10:00</span></p>
-                            <div id="simulate-success" style="display: none; margin-top: 20px; opacity: 0.6;">
-                                <small>Demo only: <button id="simulate-success-btn" class="btn-text">Simulate successful payment</button></small>
-                            </div>
                         </div>
                         <div id="payment-success" style="display: none;">
                             <div class="success-icon">
-                                <i class="fas fa-check-circle"></i>
+                                <img src="images/payment-success.png" alt="Payment Successful" class="payment-status-icon">
                             </div>
                             <h3>Payment Successful!</h3>
                             <p>Thank you for your purchase. You'll receive access to your bot shortly.</p>
@@ -256,7 +245,8 @@
                 <div class="footer-column">
                     <h4>Payment Methods</h4>
                     <div class="payment-methods">
-                        <img src="https://public.bnbstatic.com/static/images/common/binance-logo-yellow.png" alt="Binance Pay" height="40">
+                        <img src="images/binance-logo.png" alt="Binance Pay" height="40">
+                        <img src="images/payment-secure.png" alt="Secure Payments" height="40">
                     </div>
                 </div>
             </div>

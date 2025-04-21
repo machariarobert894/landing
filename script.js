@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('nav');
     
     mobileToggle.addEventListener('click', () => {
-        nav.style.display = nav.style.display === 'block' ? 'none' : 'block';
+        nav.classList.toggle('active');
         mobileToggle.classList.toggle('active');
     });
     
@@ -24,14 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Close mobile menu if open
                 if (window.innerWidth < 992) {
-                    nav.style.display = 'none';
+                    nav.classList.remove('active');
                     mobileToggle.classList.remove('active');
                 }
             }
         });
     });
     
-    // Sticky header
+    // Sticky header with improved animation
     const header = document.querySelector('header');
     const headerHeight = header.offsetHeight;
     
@@ -42,6 +42,28 @@ document.addEventListener('DOMContentLoaded', () => {
             header.classList.remove('sticky');
         }
     });
+    
+    // Reveal elements on scroll
+    const revealElements = document.querySelectorAll('.service-card, .about-content, .testimonial-item, .bot-card');
+    
+    function revealOnScroll() {
+        const windowHeight = window.innerHeight;
+        const revealPoint = 150;
+        
+        revealElements.forEach(element => {
+            const elementTop = element.getBoundingClientRect().top;
+            
+            if(elementTop < windowHeight - revealPoint) {
+                element.classList.add('revealed');
+            }
+        });
+    }
+    
+    // Initial check for elements in view
+    revealOnScroll();
+    
+    // Check on scroll
+    window.addEventListener('scroll', revealOnScroll);
     
     // Contact form submission
     const contactForm = document.getElementById('contactForm');
@@ -61,15 +83,24 @@ document.addEventListener('DOMContentLoaded', () => {
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
                     isValid = false;
+                    field.classList.add('error');
+                } else {
+                    field.classList.remove('error');
                 }
             });
             
             if (isValid) {
                 // Display success message (in a real app, this would happen after AJAX)
-                alert('Thank you for your message. We will get back to you soon!');
+                const successMessage = document.createElement('div');
+                successMessage.className = 'success-message';
+                successMessage.textContent = 'Thank you for your message. We will get back to you soon!';
+                
+                contactForm.appendChild(successMessage);
                 contactForm.reset();
-            } else {
-                alert('Please fill in all required fields.');
+                
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 5000);
             }
         });
     }
@@ -86,10 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (email && isValidEmail(email)) {
                 // In a real application, you would send this to your server
-                alert('Thank you for subscribing to our newsletter!');
+                const successMessage = document.createElement('div');
+                successMessage.className = 'success-message';
+                successMessage.textContent = 'Thank you for subscribing to our newsletter!';
+                
+                newsletterForm.appendChild(successMessage);
                 newsletterForm.reset();
+                
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 5000);
             } else {
-                alert('Please enter a valid email address.');
+                emailInput.classList.add('error');
             }
         });
     }
