@@ -2072,3 +2072,178 @@ footer {
     height: auto;
     max-height: 40px;
 }
+
+/* === Added Checkout Modal Styles === */
+
+/* General Modal Enhancements */
+.modal-content {
+    max-width: 450px; /* Slightly narrower modal */
+}
+
+.modal-header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 15px 25px;
+}
+
+.modal-header h3 {
+    color: var(--white);
+    font-weight: 600;
+}
+
+.close-modal {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-modal:hover {
+    color: var(--white);
+}
+
+.modal-body {
+    padding: 35px 30px;
+}
+
+/* Payment Processing */
+#payment-processing {
+    gap: 25px;
+}
+
+#payment-processing p {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+/* Payment QR Section */
+#payment-qr {
+    gap: 15px; /* Adjust spacing */
+}
+
+.binance-pay-brand {
+    margin-bottom: 10px;
+}
+
+.binance-modal-logo {
+    height: 35px; /* Adjust logo size */
+}
+
+.qr-code-wrapper {
+    padding: 10px; /* Reduce padding */
+    border: 3px solid #FCD535; /* Thicker border */
+    margin-bottom: 5px; /* Reduce margin */
+}
+
+#qr-code {
+    display: block; /* Ensure it behaves like a block element */
+    width: 180px; /* Slightly smaller QR code */
+    height: 180px;
+}
+
+.qr-scan-overlay {
+    width: 50px; /* Adjust overlay size */
+    height: 50px;
+}
+
+#payment-qr > p:first-of-type { /* Target the "Scan the QR code..." text */
+    font-size: 15px;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+/* Payment Links Section */
+#payment-links {
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e2e8f0;
+}
+
+.payment-note {
+    font-size: 14px;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+.btn-secondary.btn-sm { /* Style the Open Binance Pay button */
+    padding: 8px 18px;
+    font-size: 14px;
+    border-width: 1px;
+    display: inline-flex; /* Ensure it behaves correctly */
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.payment-amount {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+/* Countdown Timer */
+.countdown {
+    font-size: 14px;
+    color: var(--text-color);
+    margin-top: 15px;
+}
+
+#countdown {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Payment Success State */
+#payment-success {
+    gap: 15px;
+}
+
+.success-icon {
+    /* Icon already styled via .payment-status-icon */
+}
+
+#payment-success h3 {
+    font-size: 24px;
+    color: #10b981; /* Green color for success */
+    font-weight: 600;
+}
+
+#payment-success p {
+    font-size: 16px;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+#continue-btn {
+    padding: 12px 30px;
+}
+
+/* Payment Error State */
+#payment-error {
+    gap: 15px;
+}
+
+.error-icon i {
+    font-size: 60px;
+    color: #ef4444; /* Red color for error */
+}
+
+#payment-error h3 {
+    font-size: 24px;
+    color: #ef4444;
+    font-weight: 600;
+}
+
+#payment-error p {
+    font-size: 16px;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+#retry-btn {
+    padding: 12px 30px;
+}

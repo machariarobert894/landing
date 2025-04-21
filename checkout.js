@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
             price: 250,
             description: 'Tactical bot that hunts down optimal entry points and captures market trends with precision',
             icon: 'fa-robot',
+            binanceLink: 'https://s.binance.com/9ZSvUuN0', // Updated link
             features: [
                 'Advanced trend detection',
                 'Automated stop losses',
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
             price: 800,
             description: 'Aggressive AI-powered beast that dominates the market, crushing competition and extracting maximum profits',
             icon: 'fa-brain',
+            binanceLink: 'https://s.binance.com/nBrsy2NB', // Updated link
             features: [
                 'Advanced AI algorithms',
                 'Pattern recognition',
@@ -41,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
             price: 100,
             description: 'Entry-level Deriv bot with reliable strategies for beginners entering the market',
             icon: 'fa-seedling',
+            binanceLink: 'https://s.binance.com/sbKjSZZG', // Updated link
             features: [
                 'Simple setup for Deriv',
                 'Educational resources',
@@ -58,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             price: 300,
             description: 'Powerful Deriv bot that crushes the competition by capitalizing on momentum in market swings',
             icon: 'fa-chart-line',
+            binanceLink: 'https://s.binance.com/fZJBgKM8', // Updated link
             features: [
                 'Multi-timeframe analysis',
                 'Technical indicator suite',
@@ -75,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
             price: 500,
             description: 'High-frequency Deriv trading bot that dominates volatile markets for maximum profit extraction',
             icon: 'fa-bolt',
+            binanceLink: 'https://s.binance.com/ZaOsqCMf', // Updated link
             features: [
                 'Ultra-fast execution',
                 'Micro-profit optimization',
@@ -236,22 +241,26 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('payment-processing').style.display = 'none';
             document.getElementById('payment-qr').style.display = 'flex';
             
-            // Update the QR code to point to the actual Binance Pay link
+            // Update the QR code with the specific Binance Pay link
             document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentLink)}`;
             
             // Add direct payment link option
             const paymentLinks = document.getElementById('payment-links');
-            paymentLinks.innerHTML = `
+            if (!paymentLinks) {
+                const qrSection = document.getElementById('payment-qr');
+                const newPaymentLinks = document.createElement('div');
+                newPaymentLinks.id = 'payment-links';
+                qrSection.appendChild(newPaymentLinks);
+            }
+            document.getElementById('payment-links').innerHTML = `
+                <p class="payment-note">Scan the QR code with your Binance app or click the button below</p>
                 <a href="${paymentLink}" target="_blank" class="btn-secondary btn-sm">
                     <i class="fas fa-external-link-alt"></i> Open Binance Pay
-                </a>`;
+                </a>
+                <p class="payment-amount">Amount: ${selectedProduct.price} USDT</p>`;
             
             // Start countdown
             startCountdown();
-            
-            // For demo purposes only - in production, you would verify the payment status via your server
-            const simulateDemo = document.getElementById('simulate-success');
-            simulateDemo.style.display = 'block';
         }, 2000);
     });
 
@@ -282,17 +291,27 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('payment-processing').style.display = 'none';
             document.getElementById('payment-qr').style.display = 'flex';
             
-            // Update the QR code again
-            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(selectedProduct.binanceLink)}`;
+            // Update the QR code with the selected product's payment link
+            const paymentLink = selectedProduct.binanceLink;
+            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentLink)}`;
+            
+            // Update the payment links
+            const paymentLinks = document.getElementById('payment-links');
+            if (!paymentLinks) {
+                const qrSection = document.getElementById('payment-qr');
+                const newPaymentLinks = document.createElement('div');
+                newPaymentLinks.id = 'payment-links';
+                qrSection.appendChild(newPaymentLinks);
+            }
+            document.getElementById('payment-links').innerHTML = `
+                <p class="payment-note">Scan the QR code with your Binance app or click the button below</p>
+                <a href="${paymentLink}" target="_blank" class="btn-secondary btn-sm">
+                    <i class="fas fa-external-link-alt"></i> Open Binance Pay
+                </a>
+                <p class="payment-amount">Amount: ${selectedProduct.price} USDT</p>`;
+            
             startCountdown();
         }, 1500);
-    });
-    
-    // Demo button for testing payment flow
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.id === 'simulate-success-btn') {
-            showPaymentSuccess();
-        }
     });
     
     // Countdown timer for payment window

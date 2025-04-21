@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="shortcut icon" href="https://image.freepik.com/free-vector/logo-design-with-statistics-concept_23-2147492184.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="cookie-consent.css">
 </head>
 <body>
     <!-- Header Section -->
@@ -107,14 +108,11 @@
 
                         <div class="form-section">
                             <h4>Payment Method</h4>
-                            <div class="binance-pay-banner">
-                                <img src="images/binance-pay-banner.jpg" alt="Binance Pay" class="binance-banner-img">
-                                <p>Fast, secure cryptocurrency payments with zero fees</p>
-                            </div>
+                            
                             <div class="payment-options">
                                 <div class="payment-option active" data-payment="binance">
                                     <div class="payment-logo">
-                                        <img src="images/binance-logo.png" alt="Binance Pay">
+                                        <img src="https://images.seeklogo.com/logo-png/32/1/binance-coin-bnb-logo-png_seeklogo-325081.png" alt="Binance Pay">
                                     </div>
                                     <div class="payment-info">
                                         <h4>Binance Pay</h4>
@@ -136,13 +134,6 @@
                                     <div class="payment-check">
                                         <i class="fas fa-check-circle"></i>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <div class="crypto-support">
-                                <p>Supported cryptocurrencies:</p>
-                                <div class="crypto-icons-container">
-                                    <img src="images/crypto-icons.png" alt="Supported Cryptocurrencies" class="crypto-icons-image">
                                 </div>
                             </div>
                         </div>
@@ -181,18 +172,22 @@
                         </div>
                         <div id="payment-qr" style="display: none;">
                             <div class="binance-pay-brand">
-                                <img src="images/binance-logo.png" alt="Binance Pay" class="binance-modal-logo">
+                                <img src="https://images.seeklogo.com/logo-png/32/1/tether-usdt-logo-png_seeklogo-323175.png" alt="Payment Gateway" class="binance-modal-logo">
                             </div>
                             <div class="qr-code-wrapper">
                                 <img id="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=BinancePayDemo" alt="QR Code">
-                                <img src="images/qr-code-scan.png" alt="Scan with your phone" class="qr-scan-overlay">
+                                <img src="https://images.seeklogo.com/logo-png/32/1/tether-usdt-logo-png_seeklogo-323175.png" alt="Scan with your phone" class="qr-scan-overlay">
                             </div>
                             <p>Scan the QR code with your Binance App to complete the payment</p>
+                            <!-- Placeholder for dynamic payment link and amount -->
+                            <div id="payment-links">
+                                <!-- Content injected by checkout.js -->
+                            </div>
                             <p class="countdown">Payment window expires in <span id="countdown">10:00</span></p>
                         </div>
                         <div id="payment-success" style="display: none;">
                             <div class="success-icon">
-                                <img src="images/payment-success.png" alt="Payment Successful" class="payment-status-icon">
+                                <img src="https://bin.bnbstatic.com/static/images/common/success-icon.svg" alt="Payment Successful" class="payment-status-icon">
                             </div>
                             <h3>Payment Successful!</h3>
                             <p>Thank you for your purchase. You'll receive access to your bot shortly.</p>
@@ -245,8 +240,8 @@
                 <div class="footer-column">
                     <h4>Payment Methods</h4>
                     <div class="payment-methods">
-                        <img src="images/binance-logo.png" alt="Binance Pay" height="40">
-                        <img src="images/payment-secure.png" alt="Secure Payments" height="40">
+                        <img src="https://public.bnbstatic.com/image/cms/blog/20230509/ebb2ef1b-914c-4dcd-93c9-a2f384c9de5e.png" alt="Binance Pay" height="40">
+                        <img src="https://public.bnbstatic.com/image/cms/blog/20220614/70e4ad58-071f-4a05-be51-300d24eedae9.png" alt="Secure Payments" height="40">
                     </div>
                 </div>
             </div>
@@ -256,7 +251,22 @@
         </div>
     </footer>
 
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent" class="cookie-banner">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <i class="fas fa-cookie-bite"></i>
+                <p>We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.</p>
+            </div>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn-cookie-accept">Accept</button>
+                <button id="customize-cookies" class="btn-cookie-customize">Customize</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
     <script src="checkout.js"></script>
+    <script src="cookie-consent.js"></script>
 </body>
 </html>
