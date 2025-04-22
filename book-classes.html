@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Book Binary Options Class</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <!-- reuse header -->
+  <header>
+    <!-- ...existing header markup... -->
+  </header>
+
+  <section id="book-class">
+    <div class="container" style="padding: 120px 0; text-align:center;">
+      <div class="section-header">
+        <span class="section-tag">Book Class</span>
+        <h2 id="classTitle"></h2>
+        <p id="classDesc"></p>
+      </div>
+      <div id="classDetails" style="margin-top:40px;">
+        <div class="price" id="classPrice" style="font-size:40px;font-weight:700;"></div>
+        <p id="classSchedule" style="margin:20px 0;font-size:18px;"></p>
+        <a id="proceedBtn" class="btn-primary">Proceed to Payment</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+    const title = type === 'personal' 
+      ? 'Personalized Class Booking' 
+      : 'Standard Class Booking';
+    const desc = type === 'personal'
+      ? 'One-on-one Deriv binary options session at your convenience.'
+      : 'Group sessions every Tuesday & Thursday for Deriv binary options.';
+    const price = type === 'personal' ? '$500' : '$250';
+    const schedule = type === 'personal'
+      ? 'Flexible scheduling upon confirmation'
+      : 'Tuesdays & Thursdays';
+    const productParam = type === 'personal'
+      ? 'binary-options-personal'
+      : 'binary-options-standard';
+    const payUrl = type === 'personal'
+      ? 'https://s.binance.com/ojCf4WA4'
+      : 'https://s.binance.com/BWgZ30Jm';
+    const amount = type === 'personal' ? '500' : '250';
+    
+    document.getElementById('classTitle').textContent = title;
+    document.getElementById('classDesc').textContent = desc;
+    document.getElementById('classPrice').textContent = price;
+    document.getElementById('classSchedule').textContent = schedule;
+
+    // open Binance‐pay modal
+    document.getElementById('proceedBtn').addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('modalRequestText').textContent =
+        `DerivLite has requested ${amount} USDT payment.`;
+      document.getElementById('modalPayLink').href = payUrl;
+      
+      // Use goqr.me API for QR code generation
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(payUrl)}`;
+      document.getElementById('modalQrCode').src = qrUrl;
+
+      // Start countdown timer
+      let timeLeft = 15 * 60; // 15 minutes in seconds
+      const countdownEl = document.getElementById('countdown');
+      // Clear previous timer if exists
+      if (window.countdownTimerInterval) {
+          clearInterval(window.countdownTimerInterval);
+      }
+      window.countdownTimerInterval = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        countdownEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        if (timeLeft <= 0) {
+          clearInterval(window.countdownTimerInterval);
+          countdownEl.textContent = 'Expired';
+        }
+        timeLeft--;
+      }, 1000);
+
+      document.getElementById('paymentModal').classList.add('show');
+    });
+
+    // Enhanced modal close functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Close when clicking the X button
+      document.querySelector('#paymentModal .close-modal').addEventListener('click', closeModal);
+      
+      // Close when clicking outside the modal content
+      document.getElementById('paymentModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeModal();
+        }
+      });
+      
+      // Close with Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('paymentModal').classList.contains('show')) {
+          closeModal();
+        }
+      });
+    });
+    
+    // Centralized close modal function
+    function closeModal() {
+      document.getElementById('paymentModal').classList.remove('show');
+      // Clear timer when modal is closed
+      if (window.countdownTimerInterval) {
+        clearInterval(window.countdownTimerInterval);
+      }
+      console.log('Modal closed'); // For debugging
+    }
+    
+    // Update the existing close button listener
+    document.querySelector('#paymentModal .close-modal').addEventListener('click', closeModal);
+  </script>
+
+  <!-- updated payment modal UI with checkout-style QR display -->
+  <div id="paymentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Payment Request</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="binance-pay-banner">
+          <!-- Keep Binance logo small and clean -->
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/57/Binance_Logo.png"
+               alt="Binance Pay" class="binance-banner-img" style="height: 30px; margin-bottom: 5px;" />
+          <p class="payment-note" style="font-size: 14px; color: #333; margin: 0;">Pay securely with Binance Pay</p>
+        </div>
+        
+        <p id="modalRequestText" class="payment-amount" style="font-size: 18px; font-weight: 600; margin: 20px 0 15px; color: var(--dark-color);"></p>
+        
+        <!-- Updated QR code section -->
+        <div id="payment-qr">
+          <div class="qr-code-wrapper">
+            <img id="modalQrCode" src="" alt="Scan to pay" />
+          </div>
+          <p style="font-size: 14px; color: var(--text-color); margin-top: 5px;">Scan this QR code with your Binance app</p>
+        </div>
+        
+        <!-- Payment Links/Info Section -->
+        <div id="payment-links">
+           <a id="modalPayLink" href="#" target="_blank" class="btn-secondary btn-sm" style="width: 100%; margin-bottom: 15px; background-color: #FCD535; border-color: #FCD535; color: #1E2026; font-weight: 600;">
+            <i class="fas fa-external-link-alt"></i> Open in Binance App
+          </a>
+          <div class="countdown">
+            <p><i class="fas fa-clock"></i> Payment expires in <span id="countdown">15:00</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* General Modal Styles (Ensure these are consistent or override if needed) */
+    .modal {
+        /* ... existing modal styles ... */
+        padding-top: 5vh; /* Reduce top padding */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    .modal-content {
+        max-width: 360px; /* Make modal narrower */
+        border-radius: 10px; /* Slightly less rounded corners */
+    }
+    .modal-header {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 12px 20px; /* Reduce header padding */
+    }
+    .modal-header h3 {
+        font-size: 16px; /* Smaller header text */
+    }
+    .close-modal {
+        cursor: pointer;
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        font-size: 24px;
+        color: var(--text-color);
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        z-index: 10;
+    }
+    .close-modal:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        color: #000;
+    }
+    .modal-body {
+        padding: 20px 25px 25px; /* Reduce body padding */
+    }
+
+    /* Binance Banner */
+    .binance-pay-banner {
+        border-radius: 6px; /* Adjust radius */
+        padding: 10px 15px; /* Reduce padding */
+        margin-bottom: 15px; /* Reduce margin */
+    }
+    .binance-banner-img {
+        height: 25px !important; /* Smaller logo */
+        margin-bottom: 0 !important; /* Remove margin if logo is inline */
+    }
+    .payment-note {
+        font-size: 13px !important; /* Smaller note text */
+    }
+
+    /* Payment Amount Text */
+    .payment-amount {
+        font-size: 16px !important; /* Smaller amount text */
+        margin: 15px 0 10px !important; /* Adjust margin */
+    }
+
+    /* QR Code Section */
+    #payment-qr {
+      margin: 0 0 15px 0; /* Adjust margin */
+    }
+    
+    .qr-code-wrapper {
+      padding: 8px; /* Reduce padding */
+      border-radius: 6px; /* Adjust radius */
+      margin-bottom: 8px; /* Reduce margin */
+    }
+    
+    #modalQrCode {
+      width: 160px; /* Smaller QR code */
+      height: 160px;
+    }
+    #payment-qr p {
+        font-size: 13px !important; /* Smaller scan text */
+        margin-top: 0 !important; /* Remove top margin */
+    }
+    
+    /* Payment Links/Info Section */
+    #payment-links {
+      /* Keep existing styles */
+    }
+    
+    /* Specific Button Style Override */
+    #payment-links .btn-secondary.btn-sm {
+        width: 100% !important;
+        margin-bottom: 10px !important; /* Reduce margin */
+        padding: 10px 15px !important; /* Adjust button padding */
+        font-size: 14px !important; /* Adjust font size */
+    }
+    #payment-links .btn-secondary.btn-sm:hover {
+        /* Keep hover colors */
+    }
+
+    .countdown {
+      font-size: 12px; /* Smaller countdown text */
+    }
+    .countdown i {
+        font-size: 11px; /* Smaller icon */
+    }
+  </style>
+
+  <!-- ...existing footer or scripts... -->
+</body>
+</html>
