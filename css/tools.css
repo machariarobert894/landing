@@ -1,0 +1,539 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Source+Code+Pro:wght@400;600&display=swap');
+
+:root {
+    --primary-bg: #0c0d10;
+    --secondary-bg: #151820;
+    --panel-bg: #1a1d25;
+    --text-color: #a5f5d7;
+    --muted-text: #7aa689;
+    --accent-color: #00ff9d;
+    --highlight-color: #00c4ff;
+    --border-color: #2a3040;
+    --danger-color: #ff5252;
+    --warning-color: #ffbc2c;
+    --success-color: #34d399;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--primary-bg);
+    color: var(--text-color);
+    font-family: 'Source Code Pro', monospace;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styles */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 255, 157, 0.08);
+    border-radius: 4px;
+}
+
+.logo {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: var(--accent-color);
+    text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+}
+
+.accent {
+    color: var(--highlight-color);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 5px rgba(0, 255, 157, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 157, 0);
+    }
+}
+
+.status-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+/* Dashboard grid layout */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 15px;
+}
+
+/* Panel styles */
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--accent-color), transparent);
+    z-index: 1;
+}
+
+.panel h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: var(--highlight-color);
+}
+
+/* Control panel */
+.control-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.control-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Settings area */
+.settings {
+    margin-top: 15px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+}
+
+.setting-group {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-group label {
+    font-size: 14px;
+    color: var(--muted-text);
+}
+
+.setting-group input {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 5px;
+    width: 100px;
+    font-family: 'Share Tech Mono', monospace;
+    border-radius: 3px;
+}
+
+.setting-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 5px rgba(0, 255, 157, 0.3);
+}
+
+/* Button styles */
+.btn {
+    background: var(--secondary-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    font-family: 'Share Tech Mono', monospace;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn.primary {
+    background: rgba(0, 255, 157, 0.2);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.btn.primary:hover {
+    background: rgba(0, 255, 157, 0.3);
+    box-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+}
+
+.btn.danger {
+    background: rgba(255, 82, 82, 0.2);
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+.btn.danger:hover:not([disabled]) {
+    background: rgba(255, 82, 82, 0.3);
+    box-shadow: 0 0 10px rgba(255, 82, 82, 0.5);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Log terminal */
+.log-terminal {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.terminal {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    overflow-y: auto;
+    flex: 1;
+    position: relative;
+}
+
+.terminal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 157, 0.03) 2px,
+        rgba(0, 255, 157, 0.03) 4px
+    );
+    pointer-events: none;
+}
+
+.log-line {
+    margin-bottom: 4px;
+    animation: fadeIn 0.3s ease-in;
+    line-height: 1.4;
+    text-shadow: 0 0 2px rgba(0, 255, 157, 0.5);
+}
+
+.log-matrix {
+    animation: matrixFadeIn 0.2s ease-in;
+    opacity: 0.85;
+}
+
+.log-alert {
+    animation: alertPulse 1s ease-in-out;
+    font-weight: bold;
+}
+
+.log-success {
+    animation: successPulse 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes matrixFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    100% {
+        opacity: 0.85;
+        transform: translateY(0);
+    }
+}
+
+@keyframes alertPulse {
+    0%, 100% {
+        text-shadow: 0 0 2px rgba(255, 82, 82, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 8px rgba(255, 82, 82, 0.8);
+    }
+}
+
+@keyframes successPulse {
+    0%, 100% {
+        text-shadow: 0 0 2px rgba(52, 211, 153, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 8px rgba(52, 211, 153, 0.8);
+    }
+}
+
+/* Prediction panel */
+.prediction-panel {
+}
+
+.prediction-result h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--highlight-color);
+}
+
+.prediction-digits {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+    min-height: 60px;
+    align-items: center;
+}
+
+.prediction-digit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border-radius: 3px;
+    min-width: 60px;
+}
+
+.prediction-digit.high {
+    background: rgba(52, 211, 153, 0.2);
+    border: 1px solid var(--success-color);
+}
+
+.prediction-digit.medium {
+    background: rgba(255, 188, 44, 0.2);
+    border: 1px solid var(--warning-color);
+}
+
+.prediction-digit.low {
+    background: rgba(255, 82, 82, 0.2);
+    border: 1px solid var(--danger-color);
+}
+
+.pred-number {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.pred-percent {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.recommendation {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 10px;
+}
+
+.recommendation h3 {
+    text-align: center;
+}
+
+.trade-action {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.btn.action {
+    flex: 1;
+    justify-content: center;
+}
+
+.btn.matches {
+    background: rgba(52, 211, 153, 0.2);
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.btn.differs {
+    background: rgba(255, 82, 82, 0.2);
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+.confidence-meter {
+    margin-top: 10px;
+}
+
+.confidence-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.meter-bar {
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.meter-fill {
+    height: 100%;
+    background: var(--success-color);
+    width: 68%;
+    transition: width 0.5s ease;
+}
+
+/* Scanlines effect for the hacker vibe */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 255, 157, 0.02) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.7;
+}
+
+/* Responsiveness */
+@media (max-width: 1200px) {
+    .dashboard {
+        grid-template-columns: 1fr 1fr;
+    }
+    .log-terminal {
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .main-header {
+        padding: 8px 10px;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    .dashboard {
+        grid-template-columns: 1fr;
+        grid-gap: 10px;
+    }
+
+    .panel {
+        padding: 10px;
+    }
+
+    .panel h2 {
+        font-size: 15px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+    
+    .panel h3 {
+        font-size: 13px;
+    }
+
+    .settings {
+        margin-top: 15px;
+        padding-top: 10px;
+    }
+    .setting-group {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+    .setting-group label {
+        margin-bottom: 5px;
+    }
+    .setting-group input {
+        width: 100%;
+    }
+
+    .prediction-result h3 {
+        font-size: 14px;
+    }
+    .prediction-digits {
+        gap: 10px;
+        min-height: 50px;
+    }
+    .prediction-digit {
+        min-width: 50px;
+        padding: 8px;
+    }
+    .pred-number {
+        font-size: 20px;
+    }
+    .trade-action {
+        flex-direction: column;
+    }
+
+    .log-terminal {
+        height: 200px;
+    }
+    .terminal {
+        font-size: 11px;
+    }
+}

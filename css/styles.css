@@ -1,0 +1,547 @@
+/* General Styles */
+html {
+    scroll-behavior: smooth;
+    /* Add other global html styles if needed */
+}
+
+:root {
+    /* Define your CSS variables here if not already defined */
+    --primary-color: #3a7bd5; /* Example */
+    --primary-color-light: #6a9eff; /* Example */
+    --primary-color-dark: #2a6ac5; /* Example */
+    --primary-color-rgb: 58, 123, 213; /* Example */
+    --heading-color: #2c3e50; /* Example */
+    --text-color: #5a6a7a; /* Example */
+    --border-radius: 10px; /* Example */
+    --box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06); /* Example */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Section */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+header nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* Hero Section */
+.hero {
+    padding: 100px 0;
+    text-align: center;
+    background-color: #007bff;
+    color: #fff;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 18px;
+    margin-bottom: 40px;
+}
+
+/* Features Section */
+.features {
+    padding: 80px 0;
+    background-color: #fff;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 20px;
+}
+
+.feature-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.feature-card h3 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 22px;
+}
+
+.feature-description {
+    color: #666;
+    font-size: 16px;
+}
+
+/* Market Analysis Tools Section */
+.tools-section {
+    padding: 100px 0;
+    background-color: #f8f9fa;
+    position: relative;
+    overflow: hidden;
+}
+
+.tools-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-heading {
+    font-size: 42px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.section-subheading {
+    font-size: 18px;
+    color: #7f8c8d;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.tool-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.tool-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(58, 123, 213, 0.15);
+}
+
+.tool-icon {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.tool-icon img {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.tool-content {
+    padding: 30px;
+}
+
+.tool-card h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.tool-card p {
+    color: #7f8c8d;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.tool-features {
+    margin: 25px 0;
+    padding-left: 0;
+    list-style-type: none;
+}
+
+.tool-features li {
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 28px;
+    color: #5d6d7e;
+}
+
+.tool-features li i {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    color: #3a7bd5;
+}
+
+.tool-cta {
+    display: inline-flex;
+    align-items: center;
+    color: #3a7bd5;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+}
+
+.tool-cta i {
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+}
+
+.tool-cta:hover {
+    color: #2a6ac5;
+}
+
+.tool-cta:hover i {
+    transform: translateX(5px);
+}
+
+/* General Section Styling (Assuming this might be common) */
+.section {
+    padding: 80px 0; /* Consistent padding */
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-header h2 {
+    font-size: 36px; /* Adjusted size */
+    color: #333; /* Consistent heading color */
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.section-header .section-divider {
+    width: 60px;
+    height: 3px;
+    background-color: #3a7bd5; /* Primary color accent */
+    margin: 0 auto 20px auto;
+    border-radius: 2px;
+}
+
+.section-header p {
+    font-size: 18px;
+    color: #555; /* Consistent paragraph color */
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Market Analysis Tools Section Specific Adjustments */
+#market-analysis {
+    background-color: #f8f9fa; /* Light background */
+}
+
+#market-analysis .row {
+    display: grid; /* Using grid for flexibility */
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Responsive grid */
+    gap: 30px; /* Spacing between cards */
+}
+
+#market-analysis .card {
+    background: #ffffff; /* Ensure white background */
+    border-radius: 10px; /* Slightly more rounded corners */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); /* Softer, slightly larger shadow */
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensure cards in a row have same height */
+    border: none; /* Remove border for a cleaner look */
+    overflow: hidden; /* Ensure content respects border-radius */
+}
+
+#market-analysis .card:hover {
+    transform: translateY(-6px); /* Slightly more lift on hover */
+    box-shadow: 0 12px 30px rgba(58, 123, 213, 0.12); /* More prominent hover shadow */
+}
+
+#market-analysis .card-img {
+    padding: 35px 20px 20px 20px; /* Adjusted padding */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f0f4f8, #e4eaf1); /* Subtle gradient background for image */
+    border-bottom: 1px solid #e9ecef; /* Keep a subtle separator */
+}
+
+#market-analysis .card-img img {
+    max-width: 65px; /* Slightly smaller icon */
+    height: auto;
+    opacity: 0.9;
+}
+
+#market-analysis .card-body {
+    padding: 30px; /* Keep padding */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribute space */
+}
+
+#market-analysis .card-body h3 {
+    font-size: 22px; /* Slightly larger heading */
+    color: #2c3e50; /* Dark, professional color */
+    font-weight: 600; /* Semi-bold */
+    margin-bottom: 12px; /* Reduced bottom margin */
+    line-height: 1.3;
+}
+
+#market-analysis .card-body p {
+    font-size: 15.5px; /* Slightly adjusted size */
+    color: #5a6a7a; /* Softer text color */
+    line-height: 1.7;
+    margin-bottom: 20px; /* Adjusted spacing */
+    /* Removed flex-grow: 1; let content dictate height */
+}
+
+#market-analysis .card-body ul {
+    padding-left: 0;
+    margin-bottom: 25px; /* Space before button */
+    list-style-type: none;
+}
+
+#market-analysis .card-body ul li {
+    font-size: 15px;
+    color: #5a6a7a; /* Match paragraph color */
+    margin-bottom: 10px;
+    position: relative;
+    padding-left: 26px; /* Ensure space for icon */
+    line-height: 1.6; /* Improved line spacing */
+}
+
+#market-analysis .card-body ul li::before {
+    content: '\f00c'; /* Font Awesome check icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900; /* Solid style */
+    position: absolute;
+    left: 0;
+    top: 4px; /* Fine-tuned vertical alignment */
+    color: #3a7bd5; /* Primary color */
+    font-size: 13px; /* Slightly smaller icon */
+    line-height: 1; /* Prevent icon from affecting line height */
+}
+
+#market-analysis .btn {
+    padding: 11px 26px; /* Fine-tune padding */
+    font-size: 14.5px; /* Slightly adjusted font size */
+    font-weight: 500; /* Medium weight */
+    margin-top: 15px; /* Ensure some space above button */
+    align-self: flex-start;
+}
+
+#market-analysis .btn-primary {
+    box-shadow: 0 4px 12px rgba(58, 123, 213, 0.18); /* Adjusted shadow */
+}
+
+#market-analysis .btn-primary:hover {
+    box-shadow: 0 6px 18px rgba(42, 106, 197, 0.25); /* Adjusted hover shadow */
+    transform: translateY(-2px); /* Slightly more lift */
+}
+
+/* Ensure buttons within service cards align to the bottom */
+#market-analysis .service-card .btn {
+    margin-top: auto; /* Push button to the bottom */
+    align-self: center; /* Center button horizontally */
+}
+
+/* Service Card General Styles (Ensure these are present and suitable) */
+.service-card {
+    background-color: #fff;
+    padding: 35px 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    display: flex; /* Added for flex alignment */
+    flex-direction: column; /* Added for flex alignment */
+    height: 100%; /* Ensure cards stretch */
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.09);
+}
+
+.service-icon {
+    width: 70px;
+    height: 70px;
+    line-height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color-light), var(--primary-color));
+    color: #fff;
+    font-size: 30px;
+    margin: 0 auto 25px auto;
+    transition: all 0.3s ease;
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1) rotate(10deg);
+}
+
+.service-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--heading-color);
+    margin-bottom: 15px;
+}
+
+.service-card p {
+    color: var(--text-color);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex-grow: 1; /* Allow paragraph to push link down */
+}
+
+.service-link {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: auto; /* Push link to bottom */
+    transition: color 0.3s ease;
+}
+
+.service-link i {
+    margin-left: 5px;
+    transition: transform 0.3s ease;
+}
+
+.service-link:hover {
+    color: var(--primary-color-dark);
+}
+
+.service-link:hover i {
+    transform: translateX(4px);
+}
+
+/* Specific styles for the list within Market Analysis cards */
+#market-analysis .service-card ul {
+    list-style: none; /* Remove default bullets */
+    padding-left: 5px; /* Adjust left padding */
+    margin-top: 0; /* Adjust top margin */
+    margin-bottom: 25px; /* Space before the link */
+    text-align: left; /* Align text to the left */
+    font-size: 14.5px; /* Slightly smaller font size */
+    color: var(--text-color); /* Use standard text color */
+}
+
+#market-analysis .service-card ul li {
+    position: relative;
+    padding-left: 22px; /* Space for the icon */
+    margin-bottom: 8px; /* Spacing between items */
+    line-height: 1.5;
+}
+
+#market-analysis .service-card ul li::before {
+    content: '\f00c'; /* Font Awesome check icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900; /* Use solid style */
+    position: absolute;
+    left: 0;
+    top: 3px; /* Adjust vertical alignment */
+    color: var(--primary-color); /* Use primary color for icon */
+    font-size: 12px; /* Icon size */
+}
+
+/* General .btn and .btn-primary styles */
+.btn {
+    display: inline-block;
+    padding: 10px 25px;
+    border-radius: 5px; /* Or your site's standard radius */
+    text-decoration: none;
+    font-weight: 600; /* Or your site's standard weight */
+    transition: all 0.3s ease;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color); /* Use your primary color variable */
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.2); /* Optional shadow */
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-color-dark); /* Darker shade on hover */
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(var(--primary-color-rgb), 0.3); /* Enhanced shadow */
+    transform: translateY(-2px); /* Slight lift */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-heading {
+        font-size: 34px;
+    }
+    
+    .tools-section {
+        padding: 70px 0;
+    }
+}
