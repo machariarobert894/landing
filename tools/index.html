@@ -27,12 +27,12 @@
                 <div class="settings">
                     <div class="setting-group">
                         <label for="tickCount">Analysis Depth:</label>
-                        <input type="number" id="tickCount" value="120" min="10" max="500">
+                        <input type="number" id="tickCount" value="300" min="10" max="5000">
                     </div>
                     <!-- Add new setting for fetch count -->
                     <div class="setting-group">
                         <label for="fetchCount">Fetch Count:</label>
-                        <input type="number" id="fetchCount" value="50" min="1" max="500">
+                        <input type="number" id="fetchCount" value="300" min="1" max="5000">
                     </div>
                     <!-- Add a checkbox to enable dynamic tick fetching -->
                     <div class="setting-group">
@@ -425,9 +425,9 @@
                 // Determine count based on parameters and settings
                 if (count === null) {
                     if (dynamicFetchCheckbox.checked) {
-                        count = parseInt(fetchCountInput.value, 10) || 50;
+                        count = parseInt(fetchCountInput.value, 10) || 300;
                     } else {
-                        count = 120; // Default if no dynamic fetching
+                        count = 300; // Default if no dynamic fetching
                     }
                 }
                 
@@ -522,7 +522,7 @@
 
             // Fetch history for all markets, using fetchCountInput for number of ticks
             function fetchInitialHistories() {
-                const fetchCount = parseInt(fetchCountInput.value, 10) || 50;
+                const fetchCount = parseInt(fetchCountInput.value, 10) || 300;
                 addLog(`[CONFIG] Fetching previous ${fetchCount} ticks per market.`);
 
                 const fetchPromises = availableMarkets.map(market =>
@@ -840,16 +840,16 @@
                 let analysisDepth = parseInt(tickCountInput.value, 10);
                 let fetchCount = parseInt(fetchCountInput.value, 10);
 
-                if (isNaN(analysisDepth) || analysisDepth < 10 || analysisDepth > 500) {
+                if (isNaN(analysisDepth) || analysisDepth < 10 || analysisDepth > 5000) {
                     addLog(`[WARN] Invalid Analysis Depth (${tickCountInput.value}). Using default 120.`, 'alert');
-                    analysisDepth = 120;
-                    tickCountInput.value = 120;
+                    analysisDepth = 300;
+                    tickCountInput.value = 300;
                 }
 
-                if (isNaN(fetchCount) || fetchCount < 1 || fetchCount > 500) {
+                if (isNaN(fetchCount) || fetchCount < 1 || fetchCount > 5000) {
                     addLog(`[WARN] Invalid Fetch Count (${fetchCountInput.value}). Using default 50.`, 'alert');
-                    fetchCount = 50;
-                    fetchCountInput.value = 50;
+                    fetchCount = 300;
+                    fetchCountInput.value = 300;
                 }
 
                 addLog(`[CONFIG] Using analysis depth: ${analysisDepth} ticks.`);
