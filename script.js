@@ -138,4 +138,51 @@ document.addEventListener('DOMContentLoaded', () => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email);
     }
+
+    // Login functionality
+    async function login() {
+        const identifier = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('error-message');
+
+        if (!identifier || !password) {
+            errorMessage.textContent = 'Please enter both username/email and password.';
+            return;
+        }
+
+        try {
+            const response = await fetch('users.json');
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            const users = await response.json();
+
+            // Find user by username
+            const user = users.find(u => u.username === identifier);
+
+            if (user && user.password === password) {
+                // Successful login
+                errorMessage.textContent = '';
+                alert('Login successful!');
+                // Redirect or perform other actions upon successful login
+                // window.location.href = 'dashboard.html'; // Example redirect
+            } else {
+                // Invalid credentials
+                errorMessage.textContent = 'Invalid username or password.';
+            }
+        } catch (error) {
+            console.error('Error during login process:', error);
+            errorMessage.textContent = 'An error occurred during login. Please try again.';
+        }
+    }
+
+    // Example: Comment out code that might check login status from localStorage on page load
+    /*
+    document.addEventListener('DOMContentLoaded', () => {
+        // const loggedInUser = localStorage.getItem('loggedInUser');
+        // if (loggedInUser) {
+        //     console.log('User already logged in:', loggedInUser);
+        //     // Potentially redirect or update UI
+        // }
+    });
 });
