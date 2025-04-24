@@ -1,16 +1,10 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => { // Make listener async
     const userTableBody = document.querySelector('#userTable tbody');
-    const addUserForm = document.getElementById('addUserForm');
-    const newUsernameInput = document.getElementById('newUsername');
-    const newPasswordInput = document.getElementById('newPassword');
     const adminError = document.getElementById('adminError');
-    const addUserError = document.getElementById('addUserError');
 
+    // --- Security Check (Basic - Client-Side Only) ---
     const loggedInUser = sessionStorage.getItem('loggedInUser');
-    const ADMIN_USERNAME = 'mikemuchiri1943@karatina';
-
-    // --- Security Check (Client-Side Only - Basic UI lock) ---
-    if (loggedInUser !== ADMIN_USERNAME) {
+    if (loggedInUser !== 'mikemuchiri1943@karatina') {
         document.body.innerHTML = `
             <div class="container" style="text-align: center; padding-top: 50px;">
                 <h1 style="color: var(--danger-color);">Access Denied</h1>
@@ -27,159 +21,45 @@ document.addEventListener('DOMContentLoaded', async () => {
             .btn.primary:hover { background: rgba(0, 255, 157, 0.3); box-shadow: 0 0 10px rgba(0, 255, 157, 0.5); }
         `;
         document.head.appendChild(style);
-        return;
+        return; // Stop further execution
     }
     // --- End Security Check ---
 
-    // --- API Helper ---
-    async function apiRequest(url, options = {}) {
-        // Add the API base URL to ensure we're connecting to our Express server
-        const baseUrl = 'http://localhost:3000'; // Explicitly use our Express server's port
-        const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
-        
-        console.log(`Making API request to: ${fullUrl}`);
-        
-        options.headers = {
-            ...options.headers,
-            'Content-Type': 'application/json',
-            'X-Request-User': loggedInUser
-        };
-
-        let response;
+    // Fetch users from users.json
+    async function getUsers() {
+        adminError.textContent = ''; // Clear previous errors
         try {
-            response = await fetch(fullUrl, options);
-
+            const response = await fetch('../users.json');
             if (!response.ok) {
-                let errorData;
-                try {
-                    errorData = await response.json();
-                } catch (parseError) {
-                    throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
-                }
-                throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            if (response.status === 204) {
-                return null;
+            const users = await response.json();
+            if (!users || users.length === 0) {
+                 adminError.textContent = "No users found in users.json or the file is empty.";
+                 return [];
             }
-
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                return await response.json();
-            } else {
-                console.warn(`Received non-JSON response for ${fullUrl} with status ${response.status}`);
-                return null;
-            }
-
-        } catch (error) {
-            console.error(`API Request Error for ${options.method || 'GET'} ${fullUrl}:`, error);
-            if (adminError) {
-                adminError.textContent = `API Error: ${error.message}`;
-                adminError.style.color = 'var(--danger-color)';
-            }
-            throw error;
+            return users;
+        } catch (e) {
+            console.error("Error fetching users from users.json", e);
+            adminError.textContent = "Failed to load user data from users.json. Check console for details.";
+            return []; // Return empty array on error
         }
     }
 
-    // Fetch users from the server API
-    async function loadUsersFromServer() {
-        adminError.textContent = '';
-        try {
-            const users = await apiRequest('/api/users');
-            renderUsers(users || []);  // Ensure users is at least an empty array
-        } catch (error) {
-            adminError.textContent = `Failed to load users: ${error.message}`;
-            renderUsers([]);
-        }
-    }
+    // Render user table (now read-only)
+    async function renderUsers() {
+        const users = await getUsers(); // Fetch users asynchronously
+        userTableBody.innerHTML = ''; // Clear existing rows
 
-    // Render user table
-    function renderUsers(users) {
-        userTableBody.innerHTML = '';
-
-        if (!users || users.length === 0) {
-            adminError.textContent = "No users found or failed to load users.";
-            return;
-        }
-
-        users.forEach(user => {
-            const row = userTableBody.insertRow();
-            row.insertCell(0).textContent = user.username;
-
-            const actionCell = row.insertCell(1);
-            if (user.username !== ADMIN_USERNAME) {
-                const deleteButton = document.createElement('button');
-                deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
-                deleteButton.classList.add('btn', 'danger', 'btn-delete');
-                deleteButton.onclick = () => deleteUserFromServer(user.username);
-                actionCell.appendChild(deleteButton);
-            } else {
-                actionCell.textContent = '(Protected)';
-            }
-        });
-    }
-
-    // Add a new user via the server API
-    async function addUserToServer(username, password) {
-        addUserError.textContent = '';
-        adminError.textContent = '';
-
-        if (!username || !password) {
-             addUserError.textContent = 'Username and password cannot be empty.';
-             return;
-        }
-
-        try {
-            const newUser = await apiRequest('/api/users', {
-                method: 'POST',
-                body: JSON.stringify({ username, password, requestUser: loggedInUser })
+        if (users.length > 0) {
+            users.forEach(user => {
+                const row = userTableBody.insertRow();
+                row.insertCell(0).textContent = user.username;
+                row.insertCell(1).textContent = '********'; // Placeholder for password
             });
-
-            adminError.textContent = `User "${newUser.username}" added successfully.`;
-            adminError.style.color = 'var(--success-color)';
-            addUserForm.reset();
-            await loadUsersFromServer();
-
-        } catch (error) {
-            addUserError.textContent = error.message;
         }
     }
 
-    // Delete a user via the server API
-    async function deleteUserFromServer(username) {
-        adminError.textContent = '';
-
-        if (username === ADMIN_USERNAME) {
-            adminError.textContent = "Cannot delete the main admin user.";
-            adminError.style.color = 'var(--danger-color)';
-            return;
-        }
-
-        if (confirm(`Are you sure you want to permanently delete user "${username}"?`)) {
-            try {
-                const result = await apiRequest(`/api/users/${username}`, {
-                    method: 'DELETE',
-                    body: JSON.stringify({ requestUser: loggedInUser })
-                });
-
-                adminError.textContent = result?.message || `User "${username}" deleted successfully.`;
-                adminError.style.color = 'var(--success-color)';
-                await loadUsersFromServer();
-
-            } catch (error) {
-                // Error is handled and displayed by apiRequest helper
-            }
-        }
-    }
-
-    // Event listener for the add user form
-    addUserForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const newUsername = newUsernameInput.value.trim();
-        const newPassword = newPasswordInput.value;
-        await addUserToServer(newUsername, newPassword);
-    });
-
-    // Initial load from server
-    await loadUsersFromServer();
+    // Initial render
+    await renderUsers(); // Call the async render function
 });
