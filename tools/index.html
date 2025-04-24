@@ -953,7 +953,7 @@
                 updateSignalPanel(market, digit, confidence);
                 
                 // Set the lock time to prevent too frequent signals
-                signalLockUntil = Date.now() + 15000; // 15 seconds
+                signalLockUntil = Date.now() + 35000; // 15 seconds
                 startSignalCountdown();
                 
                 // Play the notification sound if we have one
