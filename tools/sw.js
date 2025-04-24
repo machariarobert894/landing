@@ -1,8 +1,8 @@
 const CACHE_NAME = 'digitmatch-signal-tool-v1';
 const urlsToCache = [
-  '/landing/tools/index.html',
-  '/landing/css/tools.css',
-  '/landing/js/tools.js',
+  '/tools/index.html',
+  '/css/tools.css',
+  '/js/tools.js',
   // Add other essential assets like icons if needed
   // '/landing/images/icons/icon-192.png',
   // '/landing/images/icons/icon-512.png',
