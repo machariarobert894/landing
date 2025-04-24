@@ -6,6 +6,10 @@
     <title>DIGIT//MATCH - Market Signal Tool</title>
     <link rel="stylesheet" href="../css/tools.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    <!-- Theme Color for PWA -->
+    <meta name="theme-color" content="#2c3e50">
 </head>
 <body>
     <div class="container">
@@ -77,6 +81,19 @@
 
     <script src="../js/tools.js"></script>
     <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const terminal = document.getElementById('terminal');
             const startBtn = document.getElementById('startAnalysis');
