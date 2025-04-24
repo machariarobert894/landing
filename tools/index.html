@@ -100,7 +100,7 @@
                 <!-- Add signal countdown timer -->
                 <div id="signalCountdown" class="signal-countdown" style="display: none;">
                     <span class="countdown-label">Signal valid for: </span>
-                    <span class="countdown-value">15s</span>
+                    <span class="countdown-value">35s</span>
                 </div>
                 <div class="recommendation">
                     <h3>Trade Recommendation:</h3>
@@ -362,7 +362,7 @@
                         if (bestInitialSignal) {
                             addLog(`[ALERT] Initial signal: ${bestInitialSignal.market} → ${bestInitialSignal.digit} (${bestInitialSignal.pct.toFixed(1)}%)`, 'alert');
                             updateSignalPanel(bestInitialSignal.market, bestInitialSignal.digit, bestInitialSignal.pct);
-                            signalLockUntil = Date.now() + 15000;
+                            signalLockUntil = Date.now() + 35000;
                             startSignalCountdown();
                         } else {
                             addLog(`[INFO] No initial signal above ${maxInitialPct.toFixed(0)}% found.`);
