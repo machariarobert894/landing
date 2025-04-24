@@ -97,6 +97,11 @@
                         <span>Waiting for signal...</span>
                     </div>
                 </div>
+                <!-- Add signal countdown timer -->
+                <div id="signalCountdown" class="signal-countdown" style="display: none;">
+                    <span class="countdown-label">Signal valid for: </span>
+                    <span class="countdown-value">15s</span>
+                </div>
                 <div class="recommendation">
                     <h3>Trade Recommendation:</h3>
                     <div class="trade-action">
@@ -119,8 +124,7 @@
         // Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Use absolute path from the domain root
-                navigator.serviceWorker.register('/tools/sw.js') 
+                navigator.serviceWorker.register('/tools/sw.js')
                     .then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     })
@@ -130,6 +134,35 @@
             });
         }
 
+        // Define matrixLogs in the global scope so it's available to all functions
+        const matrixLogs = [
+            "0x", "HASH:", "ADDR:", "MEM:", "BUFF:", "KEY:", "SEED:"
+        ];
+
+        // Move these variables to global scope so they're accessible to all functions
+        let analysisRunning = false;
+        let logInterval;
+        let fastLogInterval;
+        let tickInterval;
+        let predictionTimer = null;
+        let marketStates = new Map(); // Stores { history: [], latestTickTime: 0, maxDecimals: 0 }
+        let subscribedMarkets = new Set(); // Add subscription tracking
+        let signalLockUntil = 0; // Timestamp when next signal can be shown
+        let countdownInterval = null;
+        let currentPredictionMarket = null; // Track which market has an active prediction
+        let ws = null;
+
+        // Declare DOM references in global scope
+        let terminal;
+        let startBtn;
+        let stopBtn;
+        let signalMarketEl;
+        let tickCountInput;
+        let fetchCountInput;
+        let dynamicFetchCheckbox;
+        let marketAnalyzers;
+        let adminLink;
+
         document.addEventListener('DOMContentLoaded', function() {
             // Login Modal Elements
             const loginOverlay = document.getElementById('loginOverlay');
@@ -138,31 +171,19 @@
             const passwordInput = document.getElementById('password');
             const loginError = document.getElementById('loginError');
             const getLoginLink = document.getElementById('getLoginLink'); // Get the new link
-            const adminLink = document.getElementById('adminLink'); // Get admin link element
-
+            adminLink = document.getElementById('adminLink'); // Get admin link element
             // Payment Modal Elements
             const paymentOverlay = document.getElementById('paymentOverlay');
             const closePaymentPopup = document.getElementById('closePaymentPopup');
-
             // --- Existing Tool Elements ---
-            const terminal = document.getElementById('terminal');
-            const startBtn = document.getElementById('startAnalysis');
-            const stopBtn = document.getElementById('stopAnalysis');
-            const signalMarketEl = document.getElementById('signalMarket');
-            const tickCountInput = document.getElementById('tickCount');
-            const fetchCountInput = document.getElementById('fetchCount');
-            const dynamicFetchCheckbox = document.getElementById('dynamicFetch');
-            let analysisRunning = false;
-            let logInterval;
-            let fastLogInterval;
-            let tickInterval;
-            let predictionTimer = null;
-            let marketStates = new Map(); // Stores { history: [], latestTickTime: 0, maxDecimals: 0 }
-            let subscribedMarkets = new Set(); // Add subscription tracking
-            let signalLockUntil = 0; // Timestamp when next signal can be shown
-            let countdownInterval = null;
-            let currentPredictionMarket = null; // Track which market has an active prediction
-            let ws = null;
+            // Initialize global DOM references
+            terminal = document.getElementById('terminal');
+            startBtn = document.getElementById('startAnalysis');
+            stopBtn = document.getElementById('stopAnalysis');
+            signalMarketEl = document.getElementById('signalMarket');
+            tickCountInput = document.getElementById('tickCount');
+            fetchCountInput = document.getElementById('fetchCount');
+            dynamicFetchCheckbox = document.getElementById('dynamicFetch');
 
             // --- Login Logic ---
             // Modify checkLogin to return the user object or null
@@ -236,7 +257,7 @@
             // --- Tool Initialization Function ---
             // Encapsulate the existing tool setup logic
             function initializeTool() {
-                // --- Existing Tool Logic ---
+                // --- Existing Tool Logic ----
                 const logMessages = [
                     "[SIGNAL] Checking market conditions...",
                     "[FEED] New signal received...",
@@ -246,12 +267,8 @@
                     "[DATA] Processing signal data...",
                     "[NETWORK] Feed latency normal."
                 ];
-                const matrixLogs = [
-                    "0x", "HASH:", "ADDR:", "MEM:", "BUFF:", "KEY:", "SEED:"
-                ];
                 const availableMarkets = ["R_10", "R_25", "R_50", "R_75", "R_100"];
-
-                const marketAnalyzers = {
+                marketAnalyzers = {
                     R_10: new DigitAnalyzer(),
                     R_25: new DigitAnalyzer(),
                     R_50: new DigitAnalyzer(),
@@ -294,8 +311,12 @@
                     addLog(`[INFO] Fetching historical data for all markets (depth: ${analysisDepth})...`);
                     addMatrixBurst(5);
 
-                    // Initialize WebSocket connection
-                    ws = initWebSocket();
+                    // Initialize WebSocket connection only if it doesn't exist or is closed
+                    if (!ws || ws.readyState === WebSocket.CLOSED) {
+                        ws = initWebSocket();
+                    } else if (ws.readyState === WebSocket.OPEN) {
+                        addLog("[NETWORK] Using existing WebSocket connection", 'success');
+                    }
                     
                     // Wait for WebSocket to connect before proceeding
                     setTimeout(async () => {
@@ -309,18 +330,17 @@
                             ws = initWebSocket(); // Try again
                             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait another second
                         }
-                        
                         if (!ws || ws.readyState !== WebSocket.OPEN) {
                             addLog("[ERROR] WebSocket connection failed. Please check your internet connection.", 'alert');
                             analysisRunning = false;
                             startBtn.disabled = false;
                             return;
                         }
-                        
+
                         // Proceed with fetching data now that WebSocket is ready
                         // Wait for histories to be fetched and processed before initial analysis
                         await fetchInitialHistories(); // Make sure this completes
-                        
+
                         addLog("[SYSTEM] Performing initial analysis based on fetched history...");
                         let bestInitialSignal = null;
                         let maxInitialPct = 15.0;
@@ -375,6 +395,14 @@
                             const hexCode = randomHex(8 + Math.floor(Math.random() * 10));
                             addLog(`${prefix}${hexCode}`, 'matrix');
                         }, 150);
+
+                        // Add signal generation interval - This will periodically check for new signals
+                        tickInterval = setInterval(() => {
+                            if (signalLockUntil <= Date.now()) {
+                                // Only generate a new signal if we're not locked (previous signal has expired)
+                                simulateNewSignalCheck();
+                            }
+                        }, 5000); // Check for new signals every 5 seconds
                     }, 1500); // Wait for WebSocket connection
                 });
 
@@ -384,7 +412,6 @@
                     if (!stopBtn.disabled && startBtn.disabled) {
                         addLog("[SYSTEM] Cancelling initialization...", 'alert');
                     }
-
                     analysisRunning = false;
                     startBtn.disabled = false;
                     stopBtn.disabled = true;
@@ -395,31 +422,24 @@
                     logInterval = null;
                     fastLogInterval = null;
                     tickInterval = null;
-
                     addLog("[SYSTEM] Signal feed stopped.", 'alert');
                     document.querySelector('.status-text').textContent = "SYSTEM ONLINE";
                     document.querySelector('.status-dot').style.backgroundColor = 'var(--accent-color)';
-
                     marketStates = new Map();
-
                     clearTimeout(predictionTimer);
                     predictionTimer = null;
                     clearPredictionDisplay();
                     addMatrixBurst(3);
 
-                    // Clear subscription tracking
-                    subscribedMarkets.clear();
-
-                    // Unsubscribe from all markets
+                    // Clear subscription tracking and unsubscribe from markets, but don't close the connection
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         availableMarkets.forEach(market => {
                             unsubscribeTicks(market);
                         });
-                        
-                        // Close the WebSocket connection
-                        ws.close();
-                        ws = null;
+                        // Keep WebSocket open - removed ws.close() call
+                        addLog("[NETWORK] WebSocket connection maintained for faster reconnection", 'success');
                     }
+                    subscribedMarkets.clear();
                 });
 
                 document.addEventListener('keydown', function(e) {
@@ -433,127 +453,539 @@
                         }
                     }
                 });
-
-                // --- Initial Tool State Setup ---
-                clearPredictionDisplay();
-                addLog("[SYSTEM] Login successful. Tool initialized.", 'success');
             }
 
-            // --- Initial Page Load ---
-            // Don't initialize the tool immediately, wait for login.
-            addLog("[SYSTEM] Please log in to access the tool.");
-            // Ensure admin link is hidden on initial load
-            adminLink.style.display = 'none';
-            sessionStorage.removeItem('loggedInUser'); // Clear session on page load
+            // --- Initial Tool State Setup ---
+            clearPredictionDisplay();
+            addLog("[SYSTEM] Login successful. Tool initialized.", 'success');
+        });
 
-            // --- Existing Tool Functions (keep outside initializeTool if they don't depend on DOM elements initialized later) ---
-            function getTimestamp() {
-                const now = new Date();
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                const seconds = String(now.getSeconds()).padStart(2, '0');
-                const ms = String(now.getMilliseconds()).padStart(3, '0');
-                return `${hours}:${minutes}:${seconds}.${ms}`;
+        // --- Initial Page Load ---
+        // Don't initialize the tool immediately, wait for login.
+        addLog("[SYSTEM] Please log in to access the tool.");
+        // Ensure admin link is hidden on initial load
+        adminLink.style.display = 'none';
+        sessionStorage.removeItem('loggedInUser'); // Clear session on page load
+
+        // --- Existing Tool Functions (keep outside initializeTool if they don't depend on DOM elements initialized later) ---
+        function getTimestamp() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ms = String(now.getMilliseconds()).padStart(3, '0');
+            return `${hours}:${minutes}:${seconds}.${ms}`;
+        }
+
+        function randomHex(length) {
+            let result = '';
+            const characters = '0123456789ABCDEF';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
             }
+            return result;
+        }
 
-            function randomHex(length) {
-                let result = '';
-                const characters = '0123456789ABCDEF';
-                for (let i = 0; i < length; i++) {
-                    result += characters.charAt(Math.floor(Math.random() * characters.length));
-                }
-                return result;
+        function addLog(message, type = 'normal') {
+            const logLine = document.createElement('div');
+            logLine.className = 'log-line';
+            if (type === 'matrix') {
+                logLine.classList.add('log-matrix');
+                logLine.style.color = '#00ff9d';
+            } else if (type === 'alert') {
+                logLine.classList.add('log-alert');
+                logLine.style.color = '#ff5252';
+            } else if (type === 'success') {
+                logLine.classList.add('log-success');
+                logLine.style.color = '#34d399';
             }
-
-            function addLog(message, type = 'normal') {
-                const logLine = document.createElement('div');
-                logLine.className = 'log-line';
-
-                if (type === 'matrix') {
-                    logLine.classList.add('log-matrix');
-                    logLine.style.color = '#00ff9d';
-                } else if (type === 'alert') {
-                    logLine.classList.add('log-alert');
-                    logLine.style.color = '#ff5252';
-                } else if (type === 'success') {
-                    logLine.classList.add('log-success');
-                    logLine.style.color = '#34d399';
-                }
-
-                if (type !== 'matrix') {
-                    message = `[${getTimestamp()}] ${message}`;
-                }
-
-                logLine.textContent = message;
+            if (type !== 'matrix') {
+                message = `[${getTimestamp()}] ${message}`;
+            }
+            logLine.textContent = message;
+            if (terminal) {
                 terminal.appendChild(logLine);
                 terminal.scrollTop = terminal.scrollHeight;
-
                 if (terminal.children.length > 5000) {
                     terminal.removeChild(terminal.children[0]);
                 }
+            } else {
+                console.log("Terminal not ready:", message);
             }
+        }
 
-            function addMatrixBurst(lines = 5) {
-                for (let i = 0; i < lines; i++) {
-                    const prefix = matrixLogs[Math.floor(Math.random() * matrixLogs.length)];
-                    const hexCode = randomHex(16 + Math.floor(Math.random() * 20));
-                    addLog(`${prefix}${hexCode}`, 'matrix');
-                }
+        function addMatrixBurst(lines = 5) {
+            for (let i = 0; i < lines; i++) {
+                const prefix = matrixLogs[Math.floor(Math.random() * matrixLogs.length)];
+                const hexCode = randomHex(16 + Math.floor(Math.random() * 20));
+                addLog(`${prefix}${hexCode}`, 'matrix');
             }
+        }
 
-            function clearPredictionDisplay() {
-                const predictionDigitsContainer = document.querySelector('.prediction-result .prediction-digits');
-                const recommendationActionContainer = document.querySelector('.recommendation .trade-action');
-                const confidenceLabel = document.querySelector('.confidence-meter .confidence-label');
-                const confidenceFill = document.querySelector('.confidence-meter .meter-fill');
+        function clearPredictionDisplay() {
+            const predictionDigitsContainer = document.querySelector('.prediction-result .prediction-digits');
+            const recommendationActionContainer = document.querySelector('.recommendation .trade-action');
+            const confidenceLabel = document.querySelector('.confidence-meter .confidence-label');
+            const confidenceFill = document.querySelector('.confidence-meter .meter-fill');
+            const countdownElement = document.getElementById('signalCountdown');
 
-                signalMarketEl.textContent = "Market: --";
-                predictionDigitsContainer.innerHTML = '<span>...</span>';
-                recommendationActionContainer.innerHTML = `
-                    <button class="btn action" disabled>N/A</button>
-                    <button class="btn action" disabled>N/A</button>
-                `;
-                confidenceLabel.textContent = 'Frequency: 0%';
-                confidenceFill.style.width = '0%';
+            signalMarketEl.textContent = "Market: --";
+            predictionDigitsContainer.innerHTML = '<span>...</span>';
+            recommendationActionContainer.innerHTML = `
+                <button class="btn action" disabled>N/A</button>
+                <button class="btn action" disabled>N/A</button>
+            `;
+            confidenceLabel.textContent = 'Frequency: 0%';
+            confidenceFill.style.width = '0%';
 
+            // Hide countdown when no signal
+            if (countdownElement) {
+                countdownElement.style.display = 'none';
                 if (countdownInterval) {
                     clearInterval(countdownInterval);
                     countdownInterval = null;
                 }
-                signalLockUntil = 0;
-
-                currentPredictionMarket = null;
             }
 
-            function logMarketStatistics(market) {
-                const analyzer = marketAnalyzers[market];
-                if (!analyzer || analyzer.totalDigits === 0) {
-                    addLog(`[STATS] No data available for ${market}`);
-                    return;
+            currentPredictionMarket = null;
+            signalLockUntil = 0;
+        }
+
+        function logMarketStatistics(market) {
+            const analyzer = marketAnalyzers[market];
+            if (!analyzer || analyzer.totalDigits === 0) {
+                addLog(`[STATS] No data available for ${market}`);
+                return;
+            }
+            
+            addLog(`[STATS] ${market} Statistics:`, 'success');
+            addLog(`[STATS] Sample Size: ${analyzer.totalDigits} digits`);
+            
+            const distribution = analyzer.getDistribution();
+            addLog(`[STATS] Digit Distribution:`);
+            distribution.forEach((pct, digit) => {
+                const barLength = Math.min(Math.round(pct / 2), 40);
+                const bar = '█'.repeat(barLength);
+                addLog(`${digit}: ${bar} ${pct.toFixed(2)}%`);
+            });
+
+            const evenOdd = analyzer.getEvenOddDistribution();
+            addLog(`[STATS] Even: ${evenOdd.even.toFixed(2)}% | Odd: ${evenOdd.odd.toFixed(2)}%`);
+
+            const streaks = analyzer.getStreaks();
+            addLog(`[STATS] Max Streak: ${streaks.max} (digit repeating)`);
+
+            const highLow = analyzer.getHighLowDistribution(5);
+            addLog(`[STATS] High (>5): ${highLow.high.toFixed(2)}% | Low (<5): ${highLow.low.toFixed(2)}% | Equal (=5): ${highLow.equal.toFixed(2)}%`);
+        }
+
+        // WebSocket connection function
+        function initWebSocket() {
+            addLog("[NETWORK] Initializing WebSocket connection...");
+            
+            // For demo purposes, we'll create a simulated WebSocket
+            // In a real app, you would connect to an actual WebSocket server
+            const socket = {
+                readyState: 0, // 0 = Connecting
+                reconnectAttempts: 0,
+                maxReconnectAttempts: 5,
+                manualClose: false, // Flag to track if close is manual or automatic
+                send: function(data) {
+                    if (this.readyState !== 1) {
+                        console.warn("Cannot send: WebSocket not connected");
+                        return;
+                    }
+                    console.log("WebSocket send:", data);
+                    // Simulate sending data
+                    setTimeout(() => {
+                        if (this.readyState === 1 && this.onmessage) {
+                            this.onmessage({ data: JSON.stringify({ msg_type: "ping" }) });
+                        }
+                    }, 500);
+                },
+                close: function(manual = true) {
+                    this.manualClose = manual;
+                    this.readyState = 3; // 3 = Closed
+                    console.log(manual ? "WebSocket closed by user request" : "WebSocket closed by system");
+                    if (this.onclose) {
+                        this.onclose({ 
+                            code: manual ? 1000 : 1001, 
+                            reason: manual ? "Closed by client" : "Closed by system", 
+                            wasClean: true 
+                        });
+                    }
+                },
+                // Add default handlers to prevent "undefined is not a function" errors
+                onopen: null,
+                onclose: null,
+                onerror: null,
+                onmessage: null
+            };
+            
+            // Set up our own handlers for the simulated WebSocket
+            socket.onopen = function() {
+                addLog("[NETWORK] WebSocket connection established", 'success');
+                this.reconnectAttempts = 0;
+                this.manualClose = false;
+            };
+            
+            socket.onclose = function(event) {
+                // Only log as alert if it's unexpected
+                const logType = event.wasClean ? 'normal' : 'alert';
+                const wasClean = event.wasClean ? "cleanly" : "unexpectedly";
+                addLog(`[NETWORK] WebSocket connection closed ${wasClean} (code: ${event.code || 'unknown'})`, logType);
+                if (!this.manualClose && !event.wasClean) {
+                    // Handle reconnection if the analysis is still running
+                    if (analysisRunning) {
+                        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                            const delay = Math.min(3000 * Math.pow(1.5, this.reconnectAttempts), 15000);
+                            this.reconnectAttempts++;
+                            addLog(`[NETWORK] Attempting to reconnect in ${Math.round(delay/1000)} seconds... (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+                            
+                            setTimeout(() => {
+                                if (analysisRunning) {
+                                    addLog("[NETWORK] Reconnecting WebSocket...");
+                                    ws = initWebSocket();
+                                }
+                            }, delay);
+                        } else {
+                            addLog("[ERROR] Maximum reconnection attempts reached. Please restart the feed manually.", 'alert');
+                            // Auto-stop the analysis after max reconnect attempts
+                            stopAnalysis();
+                        }
+                    }
+                }
+            };
+            
+            // Simulate connection opening after a delay
+            setTimeout(() => {
+                if (socket.readyState === 0) { // Only if we're still connecting
+                    socket.readyState = 1; // 1 = Open
+                    if (socket.onopen) socket.onopen.call(socket, {});
+                }
+            }, 1000);
+            
+            return socket;
+        }
+
+        // Helper function to stop analysis (called from reconnection logic)
+        function stopAnalysis() {
+            if (!analysisRunning) return;
+            analysisRunning = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+
+            clearInterval(logInterval);
+            clearInterval(fastLogInterval);
+            clearInterval(tickInterval);
+            logInterval = null;
+            fastLogInterval = null;
+            tickInterval = null;
+            addLog("[SYSTEM] Signal feed stopped due to connection issues.", 'alert');
+            document.querySelector('.status-text').textContent = "SYSTEM ONLINE";
+            document.querySelector('.status-dot').style.backgroundColor = 'var(--accent-color)';
+            marketStates = new Map();
+            clearTimeout(predictionTimer);
+            predictionTimer = null;
+            clearPredictionDisplay();
+            subscribedMarkets.clear();
+        }
+
+        // Subscribe to market ticks - unchanged
+        function subscribeTicks(market) {
+            if (!ws) {
+                addLog(`[ERROR] Cannot subscribe to ${market}: WebSocket not initialized`, 'alert');
+                return;
+            }
+            if (ws.readyState !== 1) {
+                addLog(`[ERROR] Cannot subscribe to ${market}: WebSocket not connected (state: ${ws.readyState})`, 'alert');
+                return;
+            }
+            if (subscribedMarkets.has(market)) {
+                addLog(`[INFO] Already subscribed to ${market}`);
+                return;
+            }
+            addLog(`[FEED] Subscribing to ${market} ticks...`);
+            subscribedMarkets.add(market);
+            // In a real app, you would send an actual subscription message here
+            // This is a simulation for demo purposes
+            try {
+                ws.send(JSON.stringify({
+                    ticks: market,
+                    subscribe: 1
+                }));
+            } catch (error) {
+                addLog(`[ERROR] Failed to send subscription request: ${error.message}`, 'alert');
+                subscribedMarkets.delete(market);
+            }
+        }
+
+        // Unsubscribe from market ticks - unchanged
+        function unsubscribeTicks(market) {
+            if (!ws) {
+                addLog(`[WARN] Cannot unsubscribe from ${market}: WebSocket not initialized`);
+                subscribedMarkets.delete(market);
+                return;
+            }
+            if (ws.readyState !== 1) {
+                addLog(`[WARN] Cannot unsubscribe from ${market}: WebSocket not connected`);
+                subscribedMarkets.delete(market);
+                return;
+            }
+            if (!subscribedMarkets.has(market)) {
+                return;
+            }
+            addLog(`[FEED] Unsubscribing from ${market} ticks...`);
+            try {
+                ws.send(JSON.stringify({
+                    ticks: market,
+                    subscribe: 0
+                }));
+                subscribedMarkets.delete(market);
+            } catch (error) {
+                addLog(`[ERROR] Failed to send unsubscribe request: ${error.message}`, 'alert');
+            }
+        }
+
+        // Fetch initial history for all markets
+        async function fetchInitialHistories() {
+            const markets = ["R_10", "R_25", "R_50", "R_75", "R_100"];
+            const fetchPromises = [];
+            for (const market of markets) {
+                fetchPromises.push(fetchMarketHistory(market));
+            }
+            
+            try {
+                await Promise.all(fetchPromises);
+                addLog("[SYSTEM] Initial history fetch complete for all markets.");
+            } catch (error) {
+                addLog("[ERROR] Failed to fetch history for some markets.", 'alert');
+            }
+        }
+
+        // Fetch history for a single market
+        async function fetchMarketHistory(market) {
+            addLog(`[FEED] Fetching history for ${market}...`);
+            
+            return new Promise((resolve) => {
+                // Simulate API response delay
+                setTimeout(() => {
+                    // Generate random tick history for demo
+                    const history = generateMockTickHistory(300);
+                    
+                    // Store in market states
+                    marketStates.set(market, {
+                        history: history,
+                        latestTickTime: Date.now(),
+                        maxDecimals: 2
+                    });
+                    
+                    addLog(`[FEED] Received ${history.length} tick history items for ${market}`);
+                    resolve();
+                }, 500 + Math.random() * 1000); // Random delay
+            });
+        }
+
+        // Generate mock tick history
+        function generateMockTickHistory(count) {
+            const history = [];
+            let price = 1000 + Math.random() * 9000;
+            for (let i = 0; i < count; i++) {
+                price += (Math.random() - 0.5) * 10;
+                history.push({
+                    price: price.toFixed(2),
+                    time: Date.now() - (count - i) * 1000
+                });
+            }
+            
+            return history;
+        }
+
+        // Analyze tick history to find patterns
+        function analyzeHistory(history, maxDecimals) {
+            const lastDigitCounts = Array(10).fill(0);
+            const analysisDepth = tickCountInput ? parseInt(tickCountInput.value, 10) : 300;
+            const sampleSize = Math.min(history.length, isNaN(analysisDepth) ? 100 : analysisDepth);
+            for (let i = history.length - sampleSize; i < history.length; i++) {
+                if (i < 0) continue;
+                const price = parseFloat(history[i].price);
+                const lastDigit = Math.floor((price * Math.pow(10, maxDecimals)) % 10);
+                if (lastDigit >= 0 && lastDigit <= 9) {
+                    lastDigitCounts[lastDigit]++;
+                }
+            }
+            
+            // Find the most frequent digit
+            let maxCount = 0;
+            let maxDigit = 0;
+            let totalCount = 0;
+            for (let digit = 0; digit < 10; digit++) {
+                totalCount += lastDigitCounts[digit];
+                if (lastDigitCounts[digit] > maxCount) {
+                    maxCount = lastDigitCounts[digit];
+                    maxDigit = digit;
+                }
+            }
+            
+            const percentFrequency = totalCount > 0 ? (maxCount / totalCount) * 100 : 0;
+            
+            return {
+                digit: maxDigit,
+                count: maxCount,
+                total: totalCount,
+                pct: percentFrequency
+            };
+        }
+
+        // Update the signal panel UI
+        function updateSignalPanel(market, digit, confidence) {
+            signalMarketEl.textContent = `Market: ${market}`;
+            currentPredictionMarket = market;
+
+            // Update digits display
+            const predictionDigitsContainer = document.querySelector('.prediction-result .prediction-digits');
+            predictionDigitsContainer.innerHTML = `<span class="large-digit">${digit}</span>`;
+
+            // Show countdown
+            const countdownElement = document.getElementById('signalCountdown');
+            if (countdownElement) {
+                countdownElement.style.display = 'block';
+            }
+            
+            // Update trade action buttons
+            const actionContainer = document.querySelector('.recommendation .trade-action');
+            actionContainer.innerHTML = `
+                <button class="btn action">BUY ${digit}</button>
+                <button class="btn action">SELL ${digit}</button>
+            `;
+            
+            // Update confidence meter
+            const confidenceLabel = document.querySelector('.confidence-meter .confidence-label');
+            const confidenceFill = document.querySelector('.confidence-meter .meter-fill');
+            const displayConfidence = Math.min(100, Math.max(0, confidence));
+            confidenceLabel.textContent = `Frequency: ${displayConfidence.toFixed(1)}%`;
+            confidenceFill.style.width = `${displayConfidence}%`;
+
+            // Set color based on confidence level
+            if (displayConfidence >= 25) {
+                confidenceFill.style.backgroundColor = 'var(--success-color)';
+            } else if (displayConfidence >= 15) {
+                confidenceFill.style.backgroundColor = 'var(--warning-color)';
+            } else {
+                confidenceFill.style.backgroundColor = 'var(--danger-color)';
+            }
+        }
+
+        // Enhanced countdown function with visual display
+        function startSignalCountdown() {
+            const countdownElement = document.getElementById('signalCountdown');
+            const countdownValue = countdownElement ? countdownElement.querySelector('.countdown-value') : null;
+
+            countdownInterval = setInterval(() => {
+                const timeLeft = Math.max(0, signalLockUntil - Date.now());
+                const secondsLeft = Math.ceil(timeLeft / 1000);
+
+                // Update visual countdown
+                if (countdownValue) {
+                    countdownValue.textContent = `${secondsLeft}s`;
+
+                    // Change color as time runs out
+                    if (secondsLeft <= 5) {
+                        countdownValue.style.color = 'var(--danger-color)';
+                    } else if (secondsLeft <= 10) {
+                        countdownValue.style.color = 'var(--warning-color)';
+                    } else {
+                        countdownValue.style.color = 'var(--success-color)';
+                    }
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    addLog(`[SYSTEM] Signal unlocked. Ready for new predictions.`);
+                    
+                    // Clear the prediction display when signal expires
+                    clearPredictionDisplay();
+                    
+                    // Reset countdown value for next use
+                    if (countdownValue) {
+                        countdownValue.textContent = '15s';
+                        countdownValue.style.color = 'var(--success-color)';
+                    }
+                    
+                    // Hide countdown element
+                    if (countdownElement) {
+                        countdownElement.style.display = 'none';
+                    }
+                }
+            }, 1000);
+        }
+
+        // Simulate checking for a new trading signal
+        function simulateNewSignalCheck() {
+            if (!analysisRunning || signalLockUntil > Date.now()) {
+                return; // Don't generate signals if analysis isn't running or we're in a lock period
+            }
+
+            // Randomly decide if we should generate a signal (30% chance)
+            if (Math.random() < 0.3) {
+                // Pick a random market
+                const availableMarkets = ["R_10", "R_25", "R_50", "R_75", "R_100"];
+                const market = availableMarkets[Math.floor(Math.random() * availableMarkets.length)];
+                
+                // Get existing market state or generate new one
+                let state = marketStates.get(market);
+                if (!state || !state.history || state.history.length === 0) {
+                    // Generate new history if needed
+                    state = {
+                        history: generateMockTickHistory(300),
+                        latestTickTime: Date.now(),
+                        maxDecimals: 2
+                    };
+                    marketStates.set(market, state);
                 }
                 
-                addLog(`[STATS] ${market} Statistics:`, 'success');
+                // Analyze and potentially create a signal
+                const digit = Math.floor(Math.random() * 10); // Random digit 0-9
+                const confidence = 15 + Math.random() * 20; // Random confidence between 15-35%
                 
-                addLog(`[STATS] Sample Size: ${analyzer.totalDigits} digits`);
+                addLog(`[ALERT] New signal detected: ${market} → ${digit} (${confidence.toFixed(1)}%)`, 'alert');
+                updateSignalPanel(market, digit, confidence);
                 
-                const distribution = analyzer.getDistribution();
-                addLog(`[STATS] Digit Distribution:`);
-                distribution.forEach((pct, digit) => {
-                    const barLength = Math.min(Math.round(pct / 2), 40);
-                    const bar = '█'.repeat(barLength);
-                    addLog(`${digit}: ${bar} ${pct.toFixed(2)}%`);
-                });
+                // Set the lock time to prevent too frequent signals
+                signalLockUntil = Date.now() + 15000; // 15 seconds
+                startSignalCountdown();
                 
-                const evenOdd = analyzer.getEvenOddDistribution();
-                addLog(`[STATS] Even: ${evenOdd.even.toFixed(2)}% | Odd: ${evenOdd.odd.toFixed(2)}%`);
-                
-                const streaks = analyzer.getStreaks();
-                addLog(`[STATS] Max Streak: ${streaks.max} (digit repeating)`);
-                
-                const highLow = analyzer.getHighLowDistribution(5);
-                addLog(`[STATS] High (>5): ${highLow.high.toFixed(2)}% | Low (<5): ${highLow.low.toFixed(2)}% | Equal (=5): ${highLow.equal.toFixed(2)}%`);
+                // Play the notification sound if we have one
+                playNotificationSound();
             }
-        });
+        }
+        
+        // Play notification sound (if available)
+        function playNotificationSound() {
+            try {
+                // Create a simple beep sound using the Audio API
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 800; // Higher pitch for alerts
+                gainNode.gain.value = 0.1; // Not too loud
+                
+                oscillator.start();
+                
+                // Stop after a short duration
+                setTimeout(() => {
+                    oscillator.stop();
+                }, 300);
+            } catch (e) {
+                console.log("Audio notification not supported");
+            }
+        }
     </script>
 </body>
 </html>
