@@ -84,8 +84,8 @@
         // Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Use explicit relative path
-                navigator.serviceWorker.register('./sw.js') 
+                // Use absolute path from the domain root
+                navigator.serviceWorker.register('/landing/tools/sw.js') 
                     .then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     })
