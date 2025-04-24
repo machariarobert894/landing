@@ -3,7 +3,7 @@
 const CACHE_NAME = 'signal-tool-cache-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
+  '/',
   // Add other important assets like CSS, JS, images here
   // e.g., '../css/style.css', '../js/main.js'
 ];
