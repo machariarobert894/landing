@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Demo - DerivLite</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="shortcut icon" href="https://image.freepik.com/free-vector/logo-design-with-statistics-concept_23-2147492184.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="cookie-consent.css">
+    <!-- Calendly inline widget styles -->
+    <style>
+        /* Additional styles for the demo page */
+        .demo-page-content {
+            padding: 120px 0 80px;
+        }
+        
+        .demo-info {
+            margin-bottom: 40px;
+        }
+        
+        .demo-benefits {
+            background-color: var(--primary-light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .demo-benefits h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .benefits-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .benefit-item i {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+        
+        .calendly-inline-widget {
+            min-width: 320px;
+            height: 700px;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-page-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendly-inline-widget {
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Deriv<span>Lite</span></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="index.html#services">Solutions</a></li>
+                    <li class="dropdown">
+                        <a href="index.html#markets">Markets <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#">Equities</a>
+                            <a href="#">Commodities</a>
+                            <a href="#">Currencies</a>
+                            <a href="#">Interest Rates</a>
+                        </div>
+                    </li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="index.html#contact" class="btn-primary">Contact Us</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Book Demo Section -->
+    <section class="demo-page-content">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Book a Demo</span>
+                <h2>Schedule Your Personalized Demo</h2>
+                <p>Experience the power of our platform with a guided tour from our expert team</p>
+            </div>
+            
+            <div class="demo-info">
+                <p>At DerivLite, we believe in transparency and ensuring our clients make informed decisions. Our personalized demos allow you to see exactly how our platform works and how it can be tailored to your specific trading needs.</p>
+            </div>
+            
+            <div class="demo-benefits">
+                <h3>What to Expect from Your Demo</h3>
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                            <h4>Platform Overview</h4>
+                            <p>Complete walkthrough of all trading features and analytics tools</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-cogs"></i>
+                        <div>
+                            <h4>Custom Configuration</h4>
+                            <p>Learn how to customize the platform to your trading style</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-question-circle"></i>
+                        <div>
+                            <h4>Q&A Session</h4>
+                            <p>Get all your questions answered by our product specialists</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <h4>Strategy Consultation</h4>
+                            <p>Receive tailored advice on optimizing your trading approach</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Calendly inline widget begin -->
+            <div class="calendly-inline-widget" data-url="https://calendly.com/walakerash6/30min?hide_event_type_details=1&hide_gdpr_banner=1" style="min-width:320px;height:700px;"></div>
+            <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+            <!-- Calendly inline widget end -->
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <p>Can't find a suitable time? <a href="index.html#contact" style="color: var(--primary-color);">Contact us</a> for additional options.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Deriv<span>Lite</span></h3>
+                    <p>Your trusted partner for simplified derivatives trading and advanced financial analytics.</p>
+                    <div class="certification-badges">
+                        <img src="https://img.freepik.com/free-vector/security-concept-illustration_114360-442.jpg" alt="Security Certification">
+                        <img src="https://img.freepik.com/free-vector/iso-certified-badge-design_1017-33681.jpg" alt="ISO Certification">
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html#home">Home</a></li>
+                        <li><a href="index.html#about">About Us</a></li>
+                        <li><a href="index.html#services">Solutions</a></li>
+                        <li><a href="index.html#market-insights">Insights</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Solutions</h4>
+                    <ul>
+                        <li><a href="#">Analytics Platform</a></li>
+                        <li><a href="#">Automated Trading</a></li>
+                        <li><a href="#">Risk Management</a></li>
+                        <li><a href="#">Training & Support</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Newsletter</h4>
+                    <p>Subscribe to our newsletter for market insights and updates</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your Email">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                    <div class="legal-links">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 DerivLite. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent" class="cookie-banner">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <i class="fas fa-cookie-bite"></i>
+                <p>We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.</p>
+            </div>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn-cookie-accept">Accept</button>
+                <button id="customize-cookies" class="btn-cookie-customize">Customize</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="cookie-consent.js"></script>
+</body>
+</html>

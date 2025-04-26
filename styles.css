@@ -2247,3 +2247,67 @@ footer {
 #retry-btn {
     padding: 12px 30px;
 }
+
+/* Book a Demo Section */
+#book-demo {
+    padding: 120px 0;
+    background-color: var(--light-color);
+    position: relative;
+}
+
+.demo-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+}
+
+.demo-image {
+    text-align: center;
+}
+
+.demo-image img {
+    max-width: 100%;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.demo-features {
+    padding: 30px;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.demo-features ul {
+    margin-bottom: 30px;
+}
+
+.demo-features ul li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.demo-features ul li i {
+    color: var(--secondary-color);
+    font-size: 20px;
+}
+
+.demo-features .btn-primary {
+    width: 100%;
+    margin-top: 10px;
+}
+
+@media (max-width: 992px) {
+    .demo-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .demo-image {
+        margin-bottom: 30px;
+    }
+}
