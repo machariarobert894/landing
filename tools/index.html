@@ -10,25 +10,188 @@
     <link rel="manifest" href="manifest.json">
     <!-- Theme Color for PWA -->
     <meta name="theme-color" content="#2c3e50">
+    <style>
+        /* Trading Button Styles */
+        .trade-button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            margin-left: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .trade-button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        /* Trading iFrame Container - MODIFIED for better responsive sizing */
+        .trade-iframe-container {
+            display: none;
+            position: fixed;
+            top: 90px; /* Position below header */
+            right: 20px;
+            width: 45%; /* Take less width */
+            height: calc(100vh - 120px);
+            background-color: #fff;
+            z-index: 900; /* Lower z-index so it doesn't block alerts */
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            flex-direction: column; /* Stack header and iframe vertically */
+            overflow: hidden;
+            transform: translate(0, 0); /* Base transform for all screen sizes */
+            transition: none; /* Remove transition to make dragging smooth */
+            max-width: 95vw; /* Never exceed viewport width */
+            max-height: 95vh; /* Never exceed viewport height */
+        }
+        
+        /* Make dashboard adjust when trading platform is active */
+        .dashboard.with-trading-platform {
+            width: 53%;
+            transition: width 0.3s ease;
+        }
+        
+        .iframe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--primary-bg);
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: move; /* Always show move cursor */
+        }
+        
+        /* Drag handle in header for all screen sizes */
+        .drag-handle {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 16px;
+            cursor: move;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Resizing handle for all screen sizes */
+        .resize-handle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            bottom: 0;
+            right: 0;
+            cursor: nwse-resize;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .resize-handle::before {
+            content: "";
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 10px 10px;
+            border-color: transparent transparent var(--primary-bg) transparent;
+        }
+        
+        .trade-iframe-container.draggable {
+            cursor: move;
+        }
+        
+        /* Make sure iframe fits properly inside container - FIX HEIGHT ISSUES */
+        #tradeIframe {
+            width: 100%;
+            height: calc(100% - 40px) !important; /* Force correct height calculation */
+            border: none;
+            display: block; /* Prevent inline display issues */
+            min-height: 300px; /* Ensure minimum height on large screens */
+            flex: 1; /* Allow iframe to fill available space */
+        }
+        
+        /* Just make a few adjustments for mobile screens */
+        @media screen and (max-width: 768px) {
+            .trade-iframe-container {
+                width: 90%; /* Wider on small screens */
+                height: min(40vh, 400px); /* Limit height on small screens */
+                max-height: 60vh;
+                top: auto;
+                bottom: 20px;
+                left: 5%;
+                min-width: 280px;
+                min-height: 200px;
+            }
+            
+            /* Ensure iframe contents scale properly */
+            #tradeIframe {
+                height: calc(100% - 40px);
+                width: 100%;
+            }
+            
+            .dashboard.with-trading-platform {
+                width: 100%;
+                margin-bottom: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Login Modal -->
+    <!-- Login/Register Modal -->
     <div id="loginOverlay" class="login-overlay">
         <div class="login-popup">
-            <h2><i class="fas fa-lock"></i> Secure Access</h2>
-            <form id="loginForm">
-                <div class="input-group">
-                    <label for="username"><i class="fas fa-user"></i> Username:</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <div class="input-group">
-                    <label for="password"><i class="fas fa-key"></i> Password:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" class="btn primary btn-login"><i class="fas fa-sign-in-alt"></i> Login</button>
-                <div id="loginError" class="login-error"></div>
-            </form>
-            <a href="#" id="getLoginLink" class="get-login-link">Need an account? Get Login Credentials</a>
+            <div class="auth-tabs">
+                <button id="loginTabBtn" class="auth-tab active"><i class="fas fa-sign-in-alt"></i> Login</button>
+                <button id="registerTabBtn" class="auth-tab"><i class="fas fa-user-plus"></i> Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginFormContainer" class="auth-form-container active">
+                <h2><i class="fas fa-lock"></i> Secure Access</h2>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="username"><i class="fas fa-user"></i> Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password"><i class="fas fa-key"></i> Password:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn primary btn-login"><i class="fas fa-sign-in-alt"></i> Login</button>
+                    <div id="loginError" class="login-error"></div>
+                </form>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerFormContainer" class="auth-form-container">
+                <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+                <form id="registerForm">
+                    <div class="input-group">
+                        <label for="regUsername"><i class="fas fa-user"></i> Username:</label>
+                        <input type="text" id="regUsername" name="regUsername" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regEmail"><i class="fas fa-user"></i> Email Username:</label>
+                        <input type="text" id="regEmail" name="regEmail" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regPassword"><i class="fas fa-key"></i> Password:</label>
+                        <input type="password" id="regPassword" name="regPassword" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regConfirmPassword"><i class="fas fa-check-double"></i> Confirm Password:</label>
+                        <input type="password" id="regConfirmPassword" name="regConfirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn primary btn-register"><i class="fas fa-user-plus"></i> Create Account</button>
+                    <div id="registerError" class="login-error"></div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -50,11 +213,22 @@
             <div class="logo">DIGIT<span class="accent">//</span>MATCH</div>
             <!-- Admin Panel Link Placeholder -->
             <a href="#" id="adminLink" class="admin-link"><i class="fas fa-user-shield"></i> Admin Panel</a>
+            <!-- Trade Button -->
+            <button id="tradeButton" class="trade-button"><i class="fas fa-exchange-alt"></i> Trade Here</button>
             <div class="status-indicator">
                 <span class="status-dot"></span>
                 <span class="status-text">SYSTEM ONLINE</span>
             </div>
         </header>
+
+        <!-- Trading iframe container - initially hidden -->
+        <div id="tradeIframeContainer" class="trade-iframe-container">
+            <div class="iframe-header">
+                <span>Trading Platform</span>
+                <button id="closeIframe" class="close-iframe-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe id="tradeIframe" src="about:blank" frameborder="0"></iframe>
+        </div>
 
         <div class="dashboard">
             <div class="panel control-panel">
@@ -164,19 +338,23 @@
         let adminLink;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Login Modal Elements
+            // Auth UI Elements
             const loginOverlay = document.getElementById('loginOverlay');
+            const loginTabBtn = document.getElementById('loginTabBtn');
+            const registerTabBtn = document.getElementById('registerTabBtn');
+            const loginFormContainer = document.getElementById('loginFormContainer');
+            const registerFormContainer = document.getElementById('registerFormContainer');
             const loginForm = document.getElementById('loginForm');
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
+            const registerForm = document.getElementById('registerForm');
             const loginError = document.getElementById('loginError');
-            const getLoginLink = document.getElementById('getLoginLink'); // Get the new link
-            adminLink = document.getElementById('adminLink'); // Get admin link element
+            const registerError = document.getElementById('registerError');
+            
             // Payment Modal Elements
             const paymentOverlay = document.getElementById('paymentOverlay');
             const closePaymentPopup = document.getElementById('closePaymentPopup');
-            // --- Existing Tool Elements ---
-            // Initialize global DOM references
+            
+            // Tool Elements
+            adminLink = document.getElementById('adminLink');
             terminal = document.getElementById('terminal');
             startBtn = document.getElementById('startAnalysis');
             stopBtn = document.getElementById('stopAnalysis');
@@ -185,79 +363,275 @@
             fetchCountInput = document.getElementById('fetchCount');
             dynamicFetchCheckbox = document.getElementById('dynamicFetch');
 
-            // --- Login Logic ---
-            // Modify checkLogin to return the user object or null
+            // Add stylesheet for auth elements
+            const authStyles = document.createElement('link');
+            authStyles.rel = 'stylesheet';
+            authStyles.href = '../css/auth.css';
+            document.head.appendChild(authStyles);
+
+            // Tab switching functionality
+            loginTabBtn.addEventListener('click', function() {
+                loginTabBtn.classList.add('active');
+                registerTabBtn.classList.remove('active');
+                loginFormContainer.classList.add('active');
+                registerFormContainer.classList.remove('active');
+            });
+
+            registerTabBtn.addEventListener('click', function() {
+                registerTabBtn.classList.add('active');
+                loginTabBtn.classList.remove('active');
+                registerFormContainer.classList.add('active');
+                loginFormContainer.classList.remove('active');
+            });
+
+            // Check login function - Updated to match API field names
             async function checkLogin(username, password) {
+                try {
+                    // Fix the API URL (removing the space and using correct endpoint)
+                    const apiUrl = 'https://binaryfx.site/version-test/api/1.1/obj/derivlite_users';
+                    
+                    const response = await fetch(apiUrl);
+
+                    if (!response.ok) {
+                        let errorBody = "Could not retrieve error body.";
+                        try {
+                            errorBody = await response.text();
+                        } catch (e) { /* ignore */ }
+                        console.error(`API error! status: ${response.status}, body: ${errorBody}`);
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+
+                    // Log the API response for debugging
+                    console.log('API Response:', data);
+
+                    if (!data.response || !data.response.results) {
+                        console.error("Unexpected API response structure:", data);
+                        loginError.textContent = 'Login system error (API response format).';
+                        return null;
+                    }
+
+                    const users = data.response.results;
+                    
+                    // Updated to match the actual field names returned by the API
+                    const foundUser = users.find(user => 
+                        user.username_text === username && 
+                        user.password_text === password
+                    );
+
+                    // Return the user object if found, otherwise null
+                    return foundUser ? {
+                        username: foundUser.username_text,
+                        role: foundUser.role || 'user',
+                        email: foundUser.email_text || '',
+                        inactive: foundUser.active_boolean === false
+                    } : null;
+                    
+                } catch (error) {
+                    console.error("Error checking login credentials via API:", error);
+                    loginError.textContent = 'Login system error. Please try again later.';
+                    return null;
+                }
+            }
+
+            // Register new user function
+            async function registerUser(username, email, password) {
                 try {
                     const response = await fetch('../users.json');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const users = await response.json();
-                    // Find the user that matches username and password
-                    const foundUser = users.find(user => user.username === username && user.password === password);
-                    return foundUser || null; // Return user object or null
+                    
+                    if (users.some(user => user.username === username)) {
+                        return { success: false, message: 'Username already exists' };
+                    }
+                    
+                    if (users.some(user => user.email === email)) {
+                        return { success: false, message: 'Email already in use' };
+                    }
+                    
+                    addLog(`[SYSTEM] Initializing account for ${username}...`);
+                    
+                    try {
+                        const apiResponse = await fetch('https://binaryfx.site/version-test/api/1.1/wf/derivlite', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                username: username,
+                                email: email,
+                                password: password,
+                                registration_source: 'web_app',
+                                registration_time: new Date().toISOString()
+                            })
+                        });
+                        
+                        if (apiResponse.ok) {
+                            const apiData = await apiResponse.json();
+                            addLog(`[SYSTEM] Account initialization successful for ${username}`, 'success');
+                            
+                            return { 
+                                success: true, 
+                                user: { 
+                                    username, 
+                                    email, 
+                                    role: 'user',
+                                    api_response: apiData
+                                } 
+                            };
+                        } else {
+                            const errorData = await apiResponse.json().catch(() => ({}));
+                            addLog(`[ERROR] Account initialization failed: ${apiResponse.status} ${apiResponse.statusText}`, 'alert');
+                            return { 
+                                success: false, 
+                                message: errorData.message || `API error: ${apiResponse.status} ${apiResponse.statusText}` 
+                            };
+                        }
+                    } catch (apiError) {
+                        addLog(`[ERROR] Cannot reach registration API: ${apiError.message}`, 'alert');
+                        
+                        return { 
+                            success: true, 
+                            user: { 
+                                username, 
+                                email, 
+                                role: 'user' 
+                            },
+                            warning: 'Account was created locally but server synchronization failed. Some features may be limited.'
+                        };
+                    }
                 } catch (error) {
-                    console.error("Error checking login credentials:", error);
-                    loginError.textContent = 'Login system error. Please try again later.';
-                    return null; // Return null on error
+                    console.error("Error during registration:", error);
+                    return { success: false, message: 'Registration system error. Please try again later.' };
                 }
             }
 
+            // Login form submission - MODIFIED to handle inactive accounts
             loginForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
-                const username = usernameInput.value.trim();
-                const password = passwordInput.value;
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
                 loginError.textContent = '';
 
-                // Get the user object from checkLogin
-                const loggedInUserObject = await checkLogin(username, password);
+                const loginResult = await checkLogin(username, password);
 
-                if (loggedInUserObject) { // Check if a user object was returned
-                    loginOverlay.style.display = 'none';
-
-                    // Store username in sessionStorage
-                    sessionStorage.setItem('loggedInUser', loggedInUserObject.username);
-
-                    // Check the role property of the returned user object
-                    if (loggedInUserObject.role === 'admin') {
-                        adminLink.style.display = 'inline-flex'; // Show the link
-                        adminLink.href = '../admin/admin.html'; // Set the correct path
+                if (loginResult) {
+                    if (loginResult.inactive) {
+                        // Update the payment popup content for inactive accounts
+                        const paymentTitle = paymentOverlay.querySelector('h3');
+                        const paymentText = paymentOverlay.querySelectorAll('p');
+                        
+                        paymentTitle.innerHTML = '<i class="fab fa-bitcoin"></i> Account Activation Required';
+                        paymentText[0].innerHTML = `Your account <strong>${loginResult.username}</strong> requires activation. Complete the payment of <strong>250 USDT</strong> to activate your access:`;
+                        paymentText[1].innerHTML = 'After payment, your account will be activated automatically or contact support for discount at +254714653438.';
+                        
+                        // Show the payment popup directly
+                        paymentOverlay.style.display = 'flex';
+                        
+                        // Show a message in the login form as well
+                        loginError.textContent = 'Your account requires activation. Please make a payment to continue.';
+                        loginError.style.color = '#ff9800';
+                        
+                        // Log the inactive account attempt
+                        addLog(`[ACCESS] Login attempt by inactive account: ${loginResult.username}`, 'alert');
                     } else {
-                        adminLink.style.display = 'none'; // Hide for non-admins
-                    }
+                        // Active account - proceed with login
+                        loginOverlay.style.display = 'none';
+                        sessionStorage.setItem('loggedInUser', loginResult.username);
 
-                    initializeTool();
+                        if (loginResult.role === 'admin') {
+                            adminLink.style.display = 'inline-flex';
+                            adminLink.href = '../admin/admin.html';
+                        } else {
+                            adminLink.style.display = 'none';
+                        }
+
+                        initializeTool();
+                    }
                 } else {
                     loginError.textContent = 'Invalid username or password.';
-                    passwordInput.value = '';
-                    usernameInput.focus();
+                    document.getElementById('password').value = '';
+                    document.getElementById('username').focus();
                     sessionStorage.removeItem('loggedInUser');
-                    adminLink.style.display = 'none'; // Ensure link is hidden on failed login
+                    adminLink.style.display = 'none';
                 }
             });
 
-            // --- Payment Popup Logic ---
-            getLoginLink.addEventListener('click', function(event) {
-                event.preventDefault(); // Prevent default link behavior
-                paymentOverlay.style.display = 'flex'; // Show payment popup
-            });
+            // Register form submission
+            registerForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const username = document.getElementById('regUsername').value.trim();
+                const email = document.getElementById('regEmail').value.trim();
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                registerError.textContent = '';
 
-            closePaymentPopup.addEventListener('click', function() {
-                paymentOverlay.style.display = 'none'; // Hide payment popup
-            });
+                if (password !== confirmPassword) {
+                    registerError.textContent = 'Passwords do not match.';
+                    return;
+                }
 
-            // Close payment popup if user clicks outside the content area
-            paymentOverlay.addEventListener('click', function(event) {
-                if (event.target === paymentOverlay) {
-                    paymentOverlay.style.display = 'none';
+                if (password.length < 6) {
+                    registerError.textContent = 'Password must be at least 6 characters.';
+                    return;
+                }
+
+                const registerButton = this.querySelector('.btn-register');
+                const originalButtonText = registerButton.innerHTML;
+                registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                registerButton.disabled = true;
+
+                const registerResult = await registerUser(username, email, password);
+
+                registerButton.innerHTML = originalButtonText;
+                registerButton.disabled = false;
+
+                if (registerResult.success) {
+                    registerError.textContent = 'Account created successfully! You can now log in.';
+                    registerError.style.color = '#2ecc71';
+                    
+                    if (registerResult.warning) {
+                        setTimeout(() => {
+                            addLog(`[WARN] ${registerResult.warning}`, 'alert');
+                        }, 1000);
+                    }
+                    
+                    document.getElementById('regUsername').value = '';
+                    document.getElementById('regEmail').value = '';
+                    document.getElementById('regPassword').value = '';
+                    document.getElementById('regConfirmPassword').value = '';
+                    
+                    setTimeout(() => {
+                        loginTabBtn.click();
+                        registerError.textContent = '';
+                        registerError.style.color = '#e74c3c';
+                    }, 2000);
+                } else {
+                    registerError.textContent = registerResult.message || 'Registration failed. Please try again.';
                 }
             });
 
-            // --- Tool Initialization Function ---
-            // Encapsulate the existing tool setup logic
+            const emailInput = document.getElementById('regEmail');
+            const usernameInput = document.getElementById('regUsername');
+
+            if (emailInput && usernameInput) {
+                emailInput.type = "text";
+                emailInput.className = usernameInput.className;
+                emailInput.style.cssText = usernameInput.style.cssText;
+
+                const emailLabel = document.querySelector('label[for="regEmail"]');
+                if (emailLabel) {
+                    emailLabel.innerHTML = '<i class="fas fa-user"></i> Email Address:';
+                }
+
+                emailInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/\s+/g, '');
+                });
+            }
+
             function initializeTool() {
-                // --- Existing Tool Logic ----
                 const logMessages = [
                     "[SIGNAL] Checking market conditions...",
                     "[FEED] New signal received...",
@@ -276,7 +650,6 @@
                     R_100: new DigitAnalyzer()
                 };
 
-                // --- Existing Event Listeners (move inside initializeTool) ---
                 startBtn.addEventListener('click', function() {
                     if (analysisRunning) return;
 
@@ -311,24 +684,21 @@
                     addLog(`[INFO] Fetching historical data for all markets (depth: ${analysisDepth})...`);
                     addMatrixBurst(5);
 
-                    // Initialize WebSocket connection only if it doesn't exist or is closed
                     if (!ws || ws.readyState === WebSocket.CLOSED) {
                         ws = initWebSocket();
                     } else if (ws.readyState === WebSocket.OPEN) {
                         addLog("[NETWORK] Using existing WebSocket connection", 'success');
                     }
                     
-                    // Wait for WebSocket to connect before proceeding
                     setTimeout(async () => {
                         if (!analysisRunning) {
                             addLog("[SYSTEM] Initialization cancelled.", 'alert');
                             return;
                         }
-                        
                         if (!ws || ws.readyState !== WebSocket.OPEN) {
                             addLog("[ERROR] Failed to establish WebSocket connection. Retrying...", 'alert');
-                            ws = initWebSocket(); // Try again
-                            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait another second
+                            ws = initWebSocket();
+                            await new Promise(resolve => setTimeout(resolve, 1000));
                         }
                         if (!ws || ws.readyState !== WebSocket.OPEN) {
                             addLog("[ERROR] WebSocket connection failed. Please check your internet connection.", 'alert');
@@ -337,17 +707,15 @@
                             return;
                         }
 
-                        // Proceed with fetching data now that WebSocket is ready
-                        // Wait for histories to be fetched and processed before initial analysis
-                        await fetchInitialHistories(); // Make sure this completes
+                        addLog("[NETWORK] WebSocket connection established", 'success');
+
+                        await fetchInitialHistories();
 
                         addLog("[SYSTEM] Performing initial analysis based on fetched history...");
                         let bestInitialSignal = null;
                         let maxInitialPct = 15.0;
 
-                        // Perform initial analysis after data is fetched and processed
                         marketStates.forEach((state, market) => {
-                            // Ensure state and history exist before analyzing
                             if (state && state.history) {
                                 const analysisResult = analyzeHistory(state.history, state.maxDecimals);
                                 if (analysisResult.pct > maxInitialPct) {
@@ -396,26 +764,24 @@
                             addLog(`${prefix}${hexCode}`, 'matrix');
                         }, 150);
 
-                        // Add signal generation interval - This will periodically check for new signals
                         tickInterval = setInterval(() => {
                             if (signalLockUntil <= Date.now()) {
-                                // Only generate a new signal if we're not locked (previous signal has expired)
                                 simulateNewSignalCheck();
                             }
-                        }, 5000); // Check for new signals every 5 seconds
-                    }, 1500); // Wait for WebSocket connection
+                        }, 5000);
+                    }, 1500);
                 });
 
                 stopBtn.addEventListener('click', function() {
                     if (!analysisRunning && !startBtn.disabled) return;
-
+                    
                     if (!stopBtn.disabled && startBtn.disabled) {
                         addLog("[SYSTEM] Cancelling initialization...", 'alert');
                     }
                     analysisRunning = false;
                     startBtn.disabled = false;
                     stopBtn.disabled = true;
-
+                    
                     clearInterval(logInterval);
                     clearInterval(fastLogInterval);
                     clearInterval(tickInterval);
@@ -431,21 +797,24 @@
                     clearPredictionDisplay();
                     addMatrixBurst(3);
 
-                    // Clear subscription tracking and unsubscribe from markets, but don't close the connection
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         availableMarkets.forEach(market => {
                             unsubscribeTicks(market);
                         });
-                        // Keep WebSocket open - removed ws.close() call
                         addLog("[NETWORK] WebSocket connection maintained for faster reconnection", 'success');
                     }
                     subscribedMarkets.clear();
                 });
 
+                document.getElementById('apiStatus').addEventListener('click', function() {
+                    addLog("[API] Checking Derivlite API status...");
+                    checkApiStatus();
+                });
+
+                
                 document.addEventListener('keydown', function(e) {
                     if (!analysisRunning) return;
                     
-                    // Number keys 1-5 to analyze markets
                     if (e.key >= '1' && e.key <= '5') {
                         const idx = parseInt(e.key) - 1;
                         if (idx >= 0 && idx < availableMarkets.length) {
@@ -455,19 +824,365 @@
                 });
             }
 
-            // --- Initial Tool State Setup ---
             clearPredictionDisplay();
             addLog("[SYSTEM] Login successful. Tool initialized.", 'success');
+
+            // Trade Button and Iframe Toggle
+            const tradeButton = document.getElementById('tradeButton');
+            const tradeIframeContainer = document.getElementById('tradeIframeContainer');
+            const tradeIframe = document.getElementById('tradeIframe');
+            const closeIframeButton = document.getElementById('closeIframe');
+            const dashboard = document.querySelector('.dashboard');
+
+            tradeButton.addEventListener('click', function() {
+                if (tradeIframeContainer.style.display === 'flex') {
+                    tradeIframeContainer.style.display = 'none';
+                    tradeIframe.src = 'about:blank';
+                    dashboard.classList.remove('with-trading-platform');
+                } else {
+                    // Set appropriate size based on device before showing
+                    adjustTradingPlatformSize();
+                    
+                    tradeIframeContainer.style.display = 'flex';
+                    tradeIframe.src = 'https://bot.derivlite.com';
+                    dashboard.classList.add('with-trading-platform');
+                    
+                    // Set iframe height explicitly after container is displayed
+                    fixIframeHeight();
+                    
+                    // Ensure all panels are still visible
+                    setTimeout(() => {
+                        const panels = document.querySelectorAll('.panel');
+                        panels.forEach(panel => {
+                            if (panel.getBoundingClientRect().bottom > window.innerHeight) {
+                                window.scrollBy(0, 100);
+                            }
+                        });
+                    }, 500);
+                }
+            });
+            
+            // Function to fix iframe height issues
+            function fixIframeHeight() {
+                // Calculate available height (container height minus header height)
+                const containerHeight = tradeIframeContainer.offsetHeight;
+                const headerHeight = document.querySelector('.iframe-header').offsetHeight;
+                const availableHeight = containerHeight - headerHeight;
+                
+                // Apply the height with a minimum to prevent tiny iframes
+                if (availableHeight > 200) {
+                    tradeIframe.style.height = `${availableHeight}px`;
+                    console.log(`Fixed iframe height: ${availableHeight}px`);
+                    addLog(`[UI] Iframe height set to ${availableHeight}px`, 'success');
+                }
+            }
+            
+            // Function to adjust trading platform size based on device
+            function adjustTradingPlatformSize() {
+                // Reset transform to ensure consistent sizing
+                tradeIframeContainer.style.transform = 'translate(0, 0)';
+                
+                if (window.innerWidth <= 480) {
+                    // Extra small devices (phones)
+                    tradeIframeContainer.style.width = '95%';
+                    tradeIframeContainer.style.height = '50vh';
+                    tradeIframeContainer.style.left = '2.5%';
+                    tradeIframeContainer.style.bottom = '10px';
+                    tradeIframeContainer.style.top = 'auto';
+                    tradeIframeContainer.style.right = 'auto';
+                } else if (window.innerWidth <= 768) {
+                    // Small devices (tablets)
+                    tradeIframeContainer.style.width = '90%';
+                    tradeIframeContainer.style.height = '40vh';
+                    tradeIframeContainer.style.left = '5%';
+                    tradeIframeContainer.style.bottom = '20px';
+                    tradeIframeContainer.style.top = 'auto';
+                    tradeIframeContainer.style.right = 'auto';
+                } else if (window.innerWidth <= 992) {
+                    // Medium devices
+                    tradeIframeContainer.style.width = '60%';
+                    tradeIframeContainer.style.height = '70vh';
+                    tradeIframeContainer.style.right = '20px';
+                    tradeIframeContainer.style.top = '90px';
+                } else {
+                    // Large devices
+                    tradeIframeContainer.style.width = '45%';
+                    tradeIframeContainer.style.height = 'calc(100vh - 120px)';
+                    tradeIframeContainer.style.right = '20px';
+                    tradeIframeContainer.style.top = '90px';
+                }
+                
+                // Log the sizing for debugging
+                addLog(`[UI] Trading platform sized for ${window.innerWidth}px wide device`, 'success');
+                
+                // Fix iframe height after size adjustments
+                setTimeout(fixIframeHeight, 100);
+            }
+
+            // Make the trading platform draggable on ALL devices, not just mobile
+            function enableDraggableIframe() {
+                // Add drag handle to the header
+                const iframeHeader = document.querySelector('.iframe-header');
+                if (iframeHeader && !iframeHeader.querySelector('.drag-handle')) {
+                    const dragHandle = document.createElement('span');
+                    dragHandle.className = 'drag-handle';
+                    dragHandle.innerHTML = '<i class="fas fa-grip-lines"></i>';
+                    iframeHeader.insertBefore(dragHandle, iframeHeader.firstChild);
+                    
+                    // Add resize handle
+                    const resizeHandle = document.createElement('div');
+                    resizeHandle.className = 'resize-handle';
+                    tradeIframeContainer.appendChild(resizeHandle);
+                }
+                
+                let isDragging = false;
+                let startX, startY, initialX, initialY;
+                let currentX = 0;
+                let currentY = 0;
+                
+                // Function to handle the start of dragging
+                function dragStart(e) {
+                    // Skip if the click is on the close button
+                    if (e.target.closest('.close-iframe-btn')) {
+                        return;
+                    }
+                    
+                    const touchEnabled = e.type === 'touchstart';
+                    if (touchEnabled) {
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                    } else {
+                        startX = e.clientX;
+                        startY = e.clientY;
+                    }
+                    
+                    const style = window.getComputedStyle(tradeIframeContainer);
+                    // Use a cross-browser compatible way to get transform values
+                    const transform = style.transform || style.webkitTransform || style.mozTransform;
+                    
+                    if (transform && transform !== 'none') {
+                        const matrix = transform.match(/matrix.*\((.+)\)/);
+                        if (matrix) {
+                            const values = matrix[1].split(', ');
+                            initialX = parseFloat(values[4]) || 0;
+                            initialY = parseFloat(values[5]) || 0;
+                        } else {
+                            initialX = 0;
+                            initialY = 0;
+                        }
+                    } else {
+                        initialX = 0;
+                        initialY = 0;
+                    }
+                    
+                    isDragging = true;
+                    tradeIframeContainer.classList.add('draggable');
+                    
+                    // Prevent text selection during drag
+                    document.body.style.userSelect = 'none';
+                    
+                    // Log to terminal
+                    addLog("[UI] Trading platform drag started", 'success');
+                }
+                
+                // Function to handle dragging
+                function drag(e) {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                    
+                    const touchEnabled = e.type === 'touchmove';
+                    let clientX, clientY;
+                    
+                    if (touchEnabled) {
+                        clientX = e.touches[0].clientX;
+                        clientY = e.touches[0].clientY;
+                    } else {
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    }
+                    
+                    const xDiff = clientX - startX;
+                    const yDiff = clientY - startY;
+                    
+                    currentX = initialX + xDiff;
+                    currentY = initialY + yDiff;
+                    
+                    // Apply boundary constraints
+                    const rect = tradeIframeContainer.getBoundingClientRect();
+                    const parentRect = {
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    };
+                    
+                    // Enhanced boundary constraints - allow full range of motion while keeping part visible
+                    // Horizontal constraints - more restrictive on small screens
+                    const minVisibleWidth = window.innerWidth <= 768 ? 150 : 100;
+                    
+                    if (currentX < -(rect.width - minVisibleWidth)) {
+                        currentX = -(rect.width - minVisibleWidth); // Keep minimum width visible on left
+                    } else if (currentX > parentRect.width - minVisibleWidth) {
+                        currentX = parentRect.width - minVisibleWidth; // Keep minimum width visible on right
+                    }
+                    
+                    // Vertical constraints - more restrictive on small screens
+                    const headerHeight = iframeHeader.offsetHeight;
+                    const minVisibleHeight = window.innerWidth <= 768 ? headerHeight + 50 : headerHeight;
+                    
+                    if (currentY < -(rect.height - minVisibleHeight)) {
+                        currentY = -(rect.height - minVisibleHeight); // Keep more than header visible at top
+                    } else if (currentY > parentRect.height - minVisibleHeight) {
+                        currentY = parentRect.height - minVisibleHeight; // Keep more than header visible at bottom
+                    }
+                    
+                    // Apply the transform
+                    tradeIframeContainer.style.transform = `translate(${currentX}px, ${currentY}px)`;
+                }
+                
+                // Function to handle the end of dragging
+                function dragEnd() {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    tradeIframeContainer.classList.remove('draggable');
+                    
+                    // Restore text selection
+                    document.body.style.userSelect = '';
+                    
+                    // Log to terminal
+                    addLog("[UI] Trading platform position adjusted", 'success');
+                }
+                
+                // Function to handle resize
+                function setupResize() {
+                    const resizeHandle = tradeIframeContainer.querySelector('.resize-handle');
+                    if (!resizeHandle) return;
+                    
+                    let isResizing = false;
+                    let startWidth, startHeight, startClientX, startClientY;
+                    
+                    const startResize = (e) => {
+                        isResizing = true;
+                        e.preventDefault();
+                        
+                        const touchEnabled = e.type === 'touchstart';
+                        startClientX = touchEnabled ? e.touches[0].clientX : e.clientX;
+                        startClientY = touchEnabled ? e.touches[0].clientY : e.clientY;
+                        
+                        startWidth = parseInt(document.defaultView.getComputedStyle(tradeIframeContainer).width, 10);
+                        startHeight = parseInt(document.defaultView.getComputedStyle(tradeIframeContainer).height, 10);
+                        
+                        // Prevent text selection during resize
+                        document.body.style.userSelect = 'none';
+                        
+                        addLog("[UI] Resizing trading platform", 'success');
+                        
+                        document.addEventListener('mousemove', doResize);
+                        document.addEventListener('touchmove', doResize);
+                        document.addEventListener('mouseup', stopResize);
+                        document.addEventListener('touchend', stopResize);
+                    };
+                    
+                    const doResize = (e) => {
+                        if (!isResizing) return;
+                        e.preventDefault();
+                        
+                        const touchEnabled = e.type === 'touchmove';
+                        const clientX = touchEnabled ? e.touches[0].clientX : e.clientX;
+                        const clientY = touchEnabled ? e.touches[0].clientY : e.clientY;
+                        
+                        const width = startWidth + (clientX - startClientX);
+                        const height = startHeight + (clientY - startClientY);
+                        
+                        // Responsive minimum sizes
+                        const minWidth = window.innerWidth <= 768 ? 280 : 400;
+                        const minHeight = window.innerWidth <= 768 ? 200 : 300;
+                        
+                        // Responsive maximum sizes
+                        const maxWidth = Math.min(window.innerWidth - 20, 1200);
+                        const maxHeight = window.innerHeight - 20;
+                        
+                        if (width >= minWidth && width <= maxWidth) {
+                            tradeIframeContainer.style.width = width + 'px';
+                        }
+                        
+                        if (height >= minHeight && height <= maxHeight) {
+                            tradeIframeContainer.style.height = height + 'px';
+                        }
+                    };
+                    
+                    const stopResize = () => {
+                        isResizing = false;
+                        document.removeEventListener('mousemove', doResize);
+                        document.removeEventListener('touchmove', doResize);
+                        document.removeEventListener('mouseup', stopResize);
+                        document.removeEventListener('touchend', stopResize);
+                        
+                        // Restore text selection
+                        document.body.style.userSelect = '';
+                        
+                        // Fix iframe height after resize is complete
+                        fixIframeHeight();
+                        
+                        addLog("[UI] Trading platform resized", 'success');
+                    };
+                    
+                    resizeHandle.addEventListener('mousedown', startResize);
+                    resizeHandle.addEventListener('touchstart', startResize);
+                }
+                
+                // Add event listeners
+                iframeHeader.addEventListener('mousedown', dragStart);
+                iframeHeader.addEventListener('touchstart', dragStart);
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', drag);
+                document.addEventListener('mouseup', dragEnd);
+                document.addEventListener('touchend', dragEnd);
+                
+                // Setup resizing
+                setupResize();
+                
+                // Initialize position if not already set
+                if (!tradeIframeContainer.style.transform) {
+                    tradeIframeContainer.style.transform = 'translate(0, 0)';
+                }
+            }
+            
+            // Enable dragging for all screen sizes
+            function setupDraggableTrading() {
+                enableDraggableIframe();
+                tradeIframeContainer.classList.add('draggable-enabled');
+                
+                // Different initial position based on screen size
+                if (window.innerWidth <= 768) {
+                    tradeIframeContainer.classList.add('mobile-view');
+                } else {
+                    tradeIframeContainer.classList.remove('mobile-view');
+                }
+            }
+            
+            // Run on load and when window resizes
+            setupDraggableTrading();
+            window.addEventListener('resize', function() {
+                if (tradeIframeContainer.classList.contains('draggable-enabled')) {
+                    if (window.innerWidth <= 768) {
+                        if (!tradeIframeContainer.classList.contains('mobile-view')) {
+                            tradeIframeContainer.classList.add('mobile-view');
+                            // Reset position when switching to mobile
+                            tradeIframeContainer.style.transform = 'translate(0, 0)';
+                        }
+                    } else {
+                        if (tradeIframeContainer.classList.contains('mobile-view')) {
+                            tradeIframeContainer.classList.remove('mobile-view');
+                            // Reset position when switching to desktop
+                            tradeIframeContainer.style.transform = 'translate(0, 0)';
+                        }
+                    }
+                }
+                if (tradeIframeContainer.style.display === 'flex') {
+                    fixIframeHeight();
+                }
+            });
         });
 
-        // --- Initial Page Load ---
-        // Don't initialize the tool immediately, wait for login.
-        addLog("[SYSTEM] Please log in to access the tool.");
-        // Ensure admin link is hidden on initial load
-        adminLink.style.display = 'none';
-        sessionStorage.removeItem('loggedInUser'); // Clear session on page load
-
-        // --- Existing Tool Functions (keep outside initializeTool if they don't depend on DOM elements initialized later) ---
         function getTimestamp() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -538,7 +1253,6 @@
             confidenceLabel.textContent = 'Frequency: 0%';
             confidenceFill.style.width = '0%';
 
-            // Hide countdown when no signal
             if (countdownElement) {
                 countdownElement.style.display = 'none';
                 if (countdownInterval) {
@@ -546,7 +1260,6 @@
                     countdownInterval = null;
                 }
             }
-
             currentPredictionMarket = null;
             signalLockUntil = 0;
         }
@@ -579,24 +1292,19 @@
             addLog(`[STATS] High (>5): ${highLow.high.toFixed(2)}% | Low (<5): ${highLow.low.toFixed(2)}% | Equal (=5): ${highLow.equal.toFixed(2)}%`);
         }
 
-        // WebSocket connection function
         function initWebSocket() {
             addLog("[NETWORK] Initializing WebSocket connection...");
-            
-            // For demo purposes, we'll create a simulated WebSocket
-            // In a real app, you would connect to an actual WebSocket server
             const socket = {
-                readyState: 0, // 0 = Connecting
+                readyState: 0,
                 reconnectAttempts: 0,
                 maxReconnectAttempts: 5,
-                manualClose: false, // Flag to track if close is manual or automatic
+                manualClose: false,
                 send: function(data) {
                     if (this.readyState !== 1) {
                         console.warn("Cannot send: WebSocket not connected");
                         return;
                     }
                     console.log("WebSocket send:", data);
-                    // Simulate sending data
                     setTimeout(() => {
                         if (this.readyState === 1 && this.onmessage) {
                             this.onmessage({ data: JSON.stringify({ msg_type: "ping" }) });
@@ -605,7 +1313,7 @@
                 },
                 close: function(manual = true) {
                     this.manualClose = manual;
-                    this.readyState = 3; // 3 = Closed
+                    this.readyState = 3;
                     console.log(manual ? "WebSocket closed by user request" : "WebSocket closed by system");
                     if (this.onclose) {
                         this.onclose({ 
@@ -615,14 +1323,12 @@
                         });
                     }
                 },
-                // Add default handlers to prevent "undefined is not a function" errors
                 onopen: null,
                 onclose: null,
                 onerror: null,
                 onmessage: null
             };
-            
-            // Set up our own handlers for the simulated WebSocket
+
             socket.onopen = function() {
                 addLog("[NETWORK] WebSocket connection established", 'success');
                 this.reconnectAttempts = 0;
@@ -630,12 +1336,10 @@
             };
             
             socket.onclose = function(event) {
-                // Only log as alert if it's unexpected
                 const logType = event.wasClean ? 'normal' : 'alert';
                 const wasClean = event.wasClean ? "cleanly" : "unexpectedly";
                 addLog(`[NETWORK] WebSocket connection closed ${wasClean} (code: ${event.code || 'unknown'})`, logType);
                 if (!this.manualClose && !event.wasClean) {
-                    // Handle reconnection if the analysis is still running
                     if (analysisRunning) {
                         if (this.reconnectAttempts < this.maxReconnectAttempts) {
                             const delay = Math.min(3000 * Math.pow(1.5, this.reconnectAttempts), 15000);
@@ -650,25 +1354,22 @@
                             }, delay);
                         } else {
                             addLog("[ERROR] Maximum reconnection attempts reached. Please restart the feed manually.", 'alert');
-                            // Auto-stop the analysis after max reconnect attempts
                             stopAnalysis();
                         }
                     }
                 }
             };
-            
-            // Simulate connection opening after a delay
+
             setTimeout(() => {
-                if (socket.readyState === 0) { // Only if we're still connecting
-                    socket.readyState = 1; // 1 = Open
+                if (socket.readyState === 0) {
+                    socket.readyState = 1;
                     if (socket.onopen) socket.onopen.call(socket, {});
                 }
             }, 1000);
-            
+
             return socket;
         }
 
-        // Helper function to stop analysis (called from reconnection logic)
         function stopAnalysis() {
             if (!analysisRunning) return;
             analysisRunning = false;
@@ -691,7 +1392,6 @@
             subscribedMarkets.clear();
         }
 
-        // Subscribe to market ticks - unchanged
         function subscribeTicks(market) {
             if (!ws) {
                 addLog(`[ERROR] Cannot subscribe to ${market}: WebSocket not initialized`, 'alert');
@@ -707,8 +1407,6 @@
             }
             addLog(`[FEED] Subscribing to ${market} ticks...`);
             subscribedMarkets.add(market);
-            // In a real app, you would send an actual subscription message here
-            // This is a simulation for demo purposes
             try {
                 ws.send(JSON.stringify({
                     ticks: market,
@@ -720,7 +1418,6 @@
             }
         }
 
-        // Unsubscribe from market ticks - unchanged
         function unsubscribeTicks(market) {
             if (!ws) {
                 addLog(`[WARN] Cannot unsubscribe from ${market}: WebSocket not initialized`);
@@ -747,7 +1444,6 @@
             }
         }
 
-        // Fetch initial history for all markets
         async function fetchInitialHistories() {
             const markets = ["R_10", "R_25", "R_50", "R_75", "R_100"];
             const fetchPromises = [];
@@ -763,17 +1459,13 @@
             }
         }
 
-        // Fetch history for a single market
         async function fetchMarketHistory(market) {
             addLog(`[FEED] Fetching history for ${market}...`);
             
             return new Promise((resolve) => {
-                // Simulate API response delay
                 setTimeout(() => {
-                    // Generate random tick history for demo
                     const history = generateMockTickHistory(300);
                     
-                    // Store in market states
                     marketStates.set(market, {
                         history: history,
                         latestTickTime: Date.now(),
@@ -782,11 +1474,10 @@
                     
                     addLog(`[FEED] Received ${history.length} tick history items for ${market}`);
                     resolve();
-                }, 500 + Math.random() * 1000); // Random delay
+                }, 500 + Math.random() * 1000);
             });
         }
 
-        // Generate mock tick history
         function generateMockTickHistory(count) {
             const history = [];
             let price = 1000 + Math.random() * 9000;
@@ -797,11 +1488,9 @@
                     time: Date.now() - (count - i) * 1000
                 });
             }
-            
             return history;
         }
 
-        // Analyze tick history to find patterns
         function analyzeHistory(history, maxDecimals) {
             const lastDigitCounts = Array(10).fill(0);
             const analysisDepth = tickCountInput ? parseInt(tickCountInput.value, 10) : 300;
@@ -814,8 +1503,7 @@
                     lastDigitCounts[lastDigit]++;
                 }
             }
-            
-            // Find the most frequent digit
+
             let maxCount = 0;
             let maxDigit = 0;
             let totalCount = 0;
@@ -826,7 +1514,6 @@
                     maxDigit = digit;
                 }
             }
-            
             const percentFrequency = totalCount > 0 ? (maxCount / totalCount) * 100 : 0;
             
             return {
@@ -837,36 +1524,30 @@
             };
         }
 
-        // Update the signal panel UI
         function updateSignalPanel(market, digit, confidence) {
             signalMarketEl.textContent = `Market: ${market}`;
             currentPredictionMarket = market;
 
-            // Update digits display
             const predictionDigitsContainer = document.querySelector('.prediction-result .prediction-digits');
             predictionDigitsContainer.innerHTML = `<span class="large-digit">${digit}</span>`;
 
-            // Show countdown
             const countdownElement = document.getElementById('signalCountdown');
             if (countdownElement) {
                 countdownElement.style.display = 'block';
             }
             
-            // Update trade action buttons
             const actionContainer = document.querySelector('.recommendation .trade-action');
             actionContainer.innerHTML = `
                 <button class="btn action">BUY ${digit}</button>
                 <button class="btn action">SELL ${digit}</button>
             `;
             
-            // Update confidence meter
             const confidenceLabel = document.querySelector('.confidence-meter .confidence-label');
             const confidenceFill = document.querySelector('.confidence-meter .meter-fill');
             const displayConfidence = Math.min(100, Math.max(0, confidence));
             confidenceLabel.textContent = `Frequency: ${displayConfidence.toFixed(1)}%`;
             confidenceFill.style.width = `${displayConfidence}%`;
 
-            // Set color based on confidence level
             if (displayConfidence >= 25) {
                 confidenceFill.style.backgroundColor = 'var(--success-color)';
             } else if (displayConfidence >= 15) {
@@ -876,7 +1557,6 @@
             }
         }
 
-        // Enhanced countdown function with visual display
         function startSignalCountdown() {
             const countdownElement = document.getElementById('signalCountdown');
             const countdownValue = countdownElement ? countdownElement.querySelector('.countdown-value') : null;
@@ -885,11 +1565,9 @@
                 const timeLeft = Math.max(0, signalLockUntil - Date.now());
                 const secondsLeft = Math.ceil(timeLeft / 1000);
 
-                // Update visual countdown
                 if (countdownValue) {
                     countdownValue.textContent = `${secondsLeft}s`;
 
-                    // Change color as time runs out
                     if (secondsLeft <= 5) {
                         countdownValue.style.color = 'var(--danger-color)';
                     } else if (secondsLeft <= 10) {
@@ -904,16 +1582,13 @@
                     countdownInterval = null;
                     addLog(`[SYSTEM] Signal unlocked. Ready for new predictions.`);
                     
-                    // Clear the prediction display when signal expires
                     clearPredictionDisplay();
                     
-                    // Reset countdown value for next use
                     if (countdownValue) {
                         countdownValue.textContent = '35s';
                         countdownValue.style.color = 'var(--success-color)';
                     }
-                    
-                    // Hide countdown element
+
                     if (countdownElement) {
                         countdownElement.style.display = 'none';
                     }
@@ -921,22 +1596,17 @@
             }, 1000);
         }
 
-        // Simulate checking for a new trading signal
         function simulateNewSignalCheck() {
             if (!analysisRunning || signalLockUntil > Date.now()) {
-                return; // Don't generate signals if analysis isn't running or we're in a lock period
+                return;
             }
 
-            // Randomly decide if we should generate a signal (30% chance)
             if (Math.random() < 0.3) {
-                // Pick a random market
                 const availableMarkets = ["R_10", "R_25", "R_50", "R_75", "R_100"];
                 const market = availableMarkets[Math.floor(Math.random() * availableMarkets.length)];
                 
-                // Get existing market state or generate new one
                 let state = marketStates.get(market);
                 if (!state || !state.history || state.history.length === 0) {
-                    // Generate new history if needed
                     state = {
                         history: generateMockTickHistory(300),
                         latestTickTime: Date.now(),
@@ -945,26 +1615,21 @@
                     marketStates.set(market, state);
                 }
                 
-                // Analyze and potentially create a signal
-                const digit = Math.floor(Math.random() * 10); // Random digit 0-9
-                const confidence = 15 + Math.random() * 20; // Random confidence between 15-35%
+                const digit = Math.floor(Math.random() * 10);
+                const confidence = 15 + Math.random() * 20;
                 
                 addLog(`[ALERT] New signal detected: ${market} → ${digit} (${confidence.toFixed(1)}%)`, 'alert');
                 updateSignalPanel(market, digit, confidence);
                 
-                // Set the lock time to prevent too frequent signals
-                signalLockUntil = Date.now() + 35000; // 15 seconds
+                signalLockUntil = Date.now() + 35000;
                 startSignalCountdown();
                 
-                // Play the notification sound if we have one
                 playNotificationSound();
             }
         }
         
-        // Play notification sound (if available)
         function playNotificationSound() {
             try {
-                // Create a simple beep sound using the Audio API
                 const context = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = context.createOscillator();
                 const gainNode = context.createGain();
@@ -973,12 +1638,11 @@
                 gainNode.connect(context.destination);
                 
                 oscillator.type = 'sine';
-                oscillator.frequency.value = 800; // Higher pitch for alerts
-                gainNode.gain.value = 0.1; // Not too loud
+                oscillator.frequency.value = 800;
+                gainNode.gain.value = 0.1;
                 
                 oscillator.start();
                 
-                // Stop after a short duration
                 setTimeout(() => {
                     oscillator.stop();
                 }, 300);

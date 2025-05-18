@@ -1,19 +1,14 @@
 [
   {
-    "username": "mikemuchiri1943@karatina",
-    "password": "Mercedesbenz@2019",
+    "username": "admin",
+    "password": "admin123",
+    "email": "admin@example.com",
     "role": "admin"
   },
   {
-    "username": "derivlite",
-    "password": "securepasswordkaratina"
-  },
-  {
-    "username": "user196",
-    "password": "196.345.user"
-  },
-  {
-    "username": "user197",
-    "password": "197.345.user"
+    "username": "user",
+    "password": "user123",
+    "email": "user@example.com",
+    "role": "user"
   }
 ]

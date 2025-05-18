@@ -16,6 +16,25 @@ class DigitAnalyzer {
         this.currentStreak = { digit: null, count: 0 };
         this.streakHistory = [];
         this.maxStreakLength = 0;
+
+        // Add analysis depth setting
+        this.analysisDepth = 30; // Default value
+        
+        // Add dedicated analysis buffer
+        this.analysisBuffer = [];
+        
+        // Logging settings - enable by default
+        this.loggingEnabled = true; // Changed to true to enable logging by default
+        
+        // Log that the analyzer has been initialized
+        console.log('%c DIGIT//MATCH Analyzer Initialized ', 'background: #222; color: #bada55; font-size: 14px;');
+    }
+    
+    // Enable or disable logging
+    setLogging(enabled) {
+        this.loggingEnabled = Boolean(enabled);
+        console.log(`Logging ${this.loggingEnabled ? 'enabled' : 'disabled'}`);
+        return this.loggingEnabled;
     }
     
     addDigit(digit) {
@@ -29,9 +48,38 @@ class DigitAnalyzer {
             this.recentDigits.shift();
         }
         
+        // Update dedicated analysis buffer (exact size of analysisDepth)
+        this.analysisBuffer.push(digit);
+        if (this.analysisBuffer.length > this.analysisDepth) {
+            this.analysisBuffer.shift();
+        }
+        
         // Update counts
         this.digitCounts[digit]++;
         this.totalDigits++;
+        
+        // If logging is enabled, log the current percentages
+        if (this.loggingEnabled && this.analysisBuffer.length > 0) {
+            // Log both overall and analysis buffer percentages
+            console.log(`Added digit: ${digit}`);
+            console.log("Analysis buffer:", this.analysisBuffer);
+            
+            // Count occurrences in analysis buffer
+            const bufferCounts = Array(10).fill(0);
+            for (const d of this.analysisBuffer) {
+                bufferCounts[d]++;
+            }
+            
+            // Calculate and log percentages from analysis buffer
+            const bufferPercentages = bufferCounts.map(count => 
+                (count / this.analysisBuffer.length * 100).toFixed(1)
+            );
+            
+            console.log("Percentages from last", this.analysisBuffer.length, "digits:");
+            for (let i = 0; i < 10; i++) {
+                console.log(`${i} = ${bufferPercentages[i]}%`);
+            }
+        }
         
         // Track streaks
         if (digit === this.currentStreak.digit) {
@@ -50,10 +98,12 @@ class DigitAnalyzer {
             this.currentStreak = { digit: digit, count: 1 };
         }
         
-        // Store patterns of varying lengths
+        // Store patterns of varying lengths with improved capture
         for (let i = 2; i <= this.maxPatternLength; i++) {
             if (this.recentDigits.length >= i) {
-                const pattern = this.recentDigits.slice(-i, -1).join('-');
+                // Get the pattern (the digits that come before the result)
+                const patternDigits = this.recentDigits.slice(-i-1, -1);
+                const pattern = patternDigits.join('-');
                 const result = this.recentDigits[this.recentDigits.length - 1];
                 
                 if (!this.patternMemory.has(pattern)) {
@@ -73,6 +123,65 @@ class DigitAnalyzer {
         if (this.totalDigits === 0) return Array(10).fill(0);
         
         return this.digitCounts.map(count => (count / this.totalDigits) * 100);
+    }
+    
+    // Set the analysis depth and resize the analysis buffer
+    setAnalysisDepth(depth) {
+        if (depth < 1) throw new Error("Analysis depth must be at least 1");
+        this.analysisDepth = Math.floor(depth);
+        
+        // Resize the analysis buffer to match the new depth
+        if (this.analysisBuffer.length > this.analysisDepth) {
+            // Keep only the most recent digits up to the new depth
+            this.analysisBuffer = this.analysisBuffer.slice(-this.analysisDepth);
+        }
+        
+        return this.analysisDepth;
+    }
+    
+    // Get frequency-based predictions from recent digits using the dedicated analysis buffer
+    getFrequencyPredictions(customThreshold = 12) {
+        // Use the analysis buffer which is always exactly the size of analysisDepth
+        // or smaller if we haven't collected that many digits yet
+        const count = this.analysisBuffer.length;
+        
+        if (count === 0) return { 
+            distribution: [], 
+            predictions: [],
+            analysisDepth: this.analysisDepth,
+            actualCount: 0
+        };
+        
+        // Count occurrences of each digit in the analysis buffer
+        const digitCounts = Array(10).fill(0);
+        for (const digit of this.analysisBuffer) {
+            digitCounts[digit]++;
+        }
+        
+        // Calculate percentages
+        const percentages = digitCounts.map(count => (count / this.analysisBuffer.length) * 100);
+        
+        // Create output with percentages for all digits (sorted by digit for consistency)
+        const distribution = percentages.map((percentage, digit) => ({
+            digit,
+            percentage: parseFloat(percentage.toFixed(1)),
+            count: digitCounts[digit],
+            totalAnalyzed: this.analysisBuffer.length
+        }));
+        
+        // Filter digits above threshold
+        const predictions = distribution
+            .filter(item => item.percentage > customThreshold)
+            .sort((a, b) => b.percentage - a.percentage) // Sort by percentage descending
+            .map(item => item.digit);
+        
+        return {
+            distribution,
+            predictions,
+            analysisDepth: this.analysisDepth,
+            actualCount: count,
+            buffer: [...this.analysisBuffer]  // Return a copy of the buffer for diagnostics
+        };
     }
     
     // Get prediction for the next digit based on recent pattern
@@ -211,6 +320,15 @@ class DigitAnalyzer {
         return result.sort((a, b) => b.confidence - a.confidence);
     }
     
+    // Log percentages of each digit
+    logPercentages() {
+        const distribution = this.getDistribution();
+        console.log("Digit Percentages:", distribution.map((percentage, digit) => ({
+            digit,
+            percentage: parseFloat(percentage.toFixed(1))
+        })));
+    }
+    
     // Reset all data
     reset() {
         this.recentDigits = [];
@@ -220,6 +338,7 @@ class DigitAnalyzer {
         this.currentStreak = { digit: null, count: 0 };
         this.streakHistory = [];
         this.maxStreakLength = 0;
+        this.analysisBuffer = []; // Clear the analysis buffer too
     }
 }
 
