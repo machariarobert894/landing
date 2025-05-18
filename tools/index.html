@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIGIT//MATCH - Market Signal Tool</title>
+    <!-- Favicon -->
+    <link rel="icon" href="../images/icons/deriv lite logo.png" type="image/png">
     <link rel="stylesheet" href="../css/tools.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- PWA Manifest Link -->
@@ -388,7 +390,7 @@
             async function checkLogin(username, password) {
                 try {
                     // Fix the API URL (removing the space and using correct endpoint)
-                    const apiUrl = 'https://binaryfx.site/version-test/api/1.1/obj/derivlite_users';
+                    const apiUrl = 'https://binaryfx.site/api/1.1/obj/derivlite_users';
                     
                     const response = await fetch(apiUrl);
 
@@ -454,7 +456,7 @@
                     addLog(`[SYSTEM] Initializing account for ${username}...`);
                     
                     try {
-                        const apiResponse = await fetch('https://binaryfx.site/version-test/api/1.1/wf/derivlite', {
+                        const apiResponse = await fetch('https://binaryfx.site/api/1.1/wf/derivlite', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
