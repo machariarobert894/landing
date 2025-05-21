@@ -485,7 +485,7 @@
             async function checkLogin(username, password) {
                 try {
                     // Fix the API URL (removing the space and using correct endpoint)
-                    const apiUrl = 'https://binaryfx.site/version-test/api/1.1/obj/derivlite_users';
+                    const apiUrl = 'https://binaryfx.site/api/1.1/obj/derivlite_users';
                     
                     const response = await fetch(apiUrl);
 
@@ -543,7 +543,7 @@
             async function registerUser(username, email, password, uniqueId) {
                 try {
                     // First check if the username or email already exists using the login API
-                    const apiUrl = 'https://binaryfx.site/version-test/api/1.1/obj/derivlite_users';
+                    const apiUrl = 'https://binaryfx.site/api/1.1/obj/derivlite_users';
                     const response = await fetch(apiUrl);
                     
                     if (!response.ok) {
@@ -572,7 +572,7 @@
                     addLog(`[SYSTEM] Initializing account for ${username}...`);
                     
                     try {
-                        const apiResponse = await fetch('https://binaryfx.site/version-test/api/1.1/wf/derivlite',  {
+                        const apiResponse = await fetch('https://binaryfx.site/api/1.1/wf/derivlite',  {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
