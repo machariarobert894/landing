@@ -664,7 +664,68 @@
                 }
             }
 
-            // Login form submission - MODIFIED to handle inactive accounts and device verification
+            // Register form submission
+            registerForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const username = document.getElementById('regUsername').value.trim();
+                const email = document.getElementById('regEmail').value.trim();
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                registerError.textContent = '';
+
+                if (password !== confirmPassword) {
+                    registerError.textContent = 'Passwords do not match.';
+                    return;
+                }
+
+                if (password.length < 6) {
+                    registerError.textContent = 'Password must be at least 6 characters.';
+                    return;
+                }
+
+                // Generate unique ID and store in localStorage with username as part of key
+                const uniqueId = generateUniqueId();
+                const uniqueIdKey = 'userUniqueId_' + username.toLowerCase();
+                localStorage.setItem(uniqueIdKey, uniqueId);
+                
+                addLog(`[SYSTEM] Generated unique ID for registration: ${uniqueId} (stored as ${uniqueIdKey})`);
+
+                const registerButton = this.querySelector('.btn-register');
+                const originalButtonText = registerButton.innerHTML;
+                registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                registerButton.disabled = true;
+
+                const registerResult = await registerUser(username, email, password, uniqueId);
+
+                registerButton.innerHTML = originalButtonText;
+                registerButton.disabled = false;
+
+                if (registerResult.success) {
+                    registerError.textContent = 'Account created successfully! You can now log in.';
+                    registerError.style.color = '#2ecc71';
+                    
+                    if (registerResult.warning) {
+                        setTimeout(() => {
+                            addLog(`[WARN] ${registerResult.warning}`, 'alert');
+                        }, 1000);
+                    }
+                    
+                    document.getElementById('regUsername').value = '';
+                    document.getElementById('regEmail').value = '';
+                    document.getElementById('regPassword').value = '';
+                    document.getElementById('regConfirmPassword').value = '';
+                    
+                    setTimeout(() => {
+                        loginTabBtn.click();
+                        registerError.textContent = '';
+                        registerError.style.color = '#e74c3c';
+                    }, 2000);
+                } else {
+                    registerError.textContent = registerResult.message || 'Registration failed. Please try again.';
+                }
+            });
+
+            // Login form submission - MODIFIED to handle username-specific unique IDs
             loginForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
                 const username = document.getElementById('username').value.trim();
@@ -696,7 +757,20 @@
                     } 
                     // Check if unique_id_text exists in the user record and in localStorage
                     else if (loginResult.unique_id_text) {
-                        const storedUniqueId = localStorage.getItem('userUniqueId');
+                        // Check for username-specific unique ID first
+                        const uniqueIdKey = 'userUniqueId_' + username.toLowerCase();
+                        let storedUniqueId = localStorage.getItem(uniqueIdKey);
+                        
+                        // Fallback: Check legacy format (for backward compatibility)
+                        if (!storedUniqueId) {
+                            storedUniqueId = localStorage.getItem('userUniqueId');
+                            
+                            // If found in old format, migrate to new format
+                            if (storedUniqueId && storedUniqueId === loginResult.unique_id_text) {
+                                localStorage.setItem(uniqueIdKey, storedUniqueId);
+                                addLog(`[SYSTEM] Migrated legacy unique ID to username-specific storage for ${username}`);
+                            }
+                        }
                         
                         // Just check if IDs match, no editing
                         if (storedUniqueId !== loginResult.unique_id_text) {
@@ -758,66 +832,6 @@
                     document.getElementById('username').focus();
                     sessionStorage.removeItem('loggedInUser');
                     adminLink.style.display = 'none';
-                }
-            });
-
-            // Register form submission
-            registerForm.addEventListener('submit', async function(event) {
-                event.preventDefault();
-                const username = document.getElementById('regUsername').value.trim();
-                const email = document.getElementById('regEmail').value.trim();
-                const password = document.getElementById('regPassword').value;
-                const confirmPassword = document.getElementById('regConfirmPassword').value;
-                registerError.textContent = '';
-
-                if (password !== confirmPassword) {
-                    registerError.textContent = 'Passwords do not match.';
-                    return;
-                }
-
-                if (password.length < 6) {
-                    registerError.textContent = 'Password must be at least 6 characters.';
-                    return;
-                }
-
-                // Generate unique ID and store in localStorage
-                const uniqueId = generateUniqueId();
-                localStorage.setItem('userUniqueId', uniqueId);
-                
-                addLog(`[SYSTEM] Generated unique ID for registration: ${uniqueId}`);
-
-                const registerButton = this.querySelector('.btn-register');
-                const originalButtonText = registerButton.innerHTML;
-                registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
-                registerButton.disabled = true;
-
-                const registerResult = await registerUser(username, email, password, uniqueId);
-
-                registerButton.innerHTML = originalButtonText;
-                registerButton.disabled = false;
-
-                if (registerResult.success) {
-                    registerError.textContent = 'Account created successfully! You can now log in.';
-                    registerError.style.color = '#2ecc71';
-                    
-                    if (registerResult.warning) {
-                        setTimeout(() => {
-                            addLog(`[WARN] ${registerResult.warning}`, 'alert');
-                        }, 1000);
-                    }
-                    
-                    document.getElementById('regUsername').value = '';
-                    document.getElementById('regEmail').value = '';
-                    document.getElementById('regPassword').value = '';
-                    document.getElementById('regConfirmPassword').value = '';
-                    
-                    setTimeout(() => {
-                        loginTabBtn.click();
-                        registerError.textContent = '';
-                        registerError.style.color = '#e74c3c';
-                    }, 2000);
-                } else {
-                    registerError.textContent = registerResult.message || 'Registration failed. Please try again.';
                 }
             });
 
