@@ -531,6 +531,37 @@ body::after {
     font-size: 14px;
 }
 
+/* Password visibility toggle styles */
+.password-container {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted-text);
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 5;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle:hover {
+    color: var(--accent-color);
+}
+
+.password-container input[type="text"],
+.password-container input[type="password"] {
+    padding-right: 35px; /* Make space for the toggle icon */
+}
+
 .login-popup input[type="text"]:focus,
 .login-popup input[type="password"]:focus {
     outline: none;
@@ -565,6 +596,29 @@ body::after {
     margin-top: 15px;
     min-height: 18px; /* Reserve space */
     text-align: center;
+}
+
+/* Disclaimer Link in Login Popup */
+.disclaimer-trigger-container {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.disclaimer-link {
+    font-size: 13px;
+    color: var(--muted-text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.disclaimer-link:hover {
+    color: var(--warning-color);
+    text-decoration: underline;
 }
 
 /* Payment Popup Styles */
@@ -641,6 +695,232 @@ body::after {
 
 .payment-popup .close-btn:hover {
     color: var(--danger-color);
+}
+
+/* Disclaimer Popup Styles */
+.disclaimer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(12, 13, 16, 0.97); /* Even darker for emphasis */
+    display: flex; /* Changed from none for initial state in HTML */
+    justify-content: center;
+    align-items: center;
+    z-index: 1002; /* Above login and payment overlays */
+    backdrop-filter: blur(10px); /* Stronger blur */
+}
+
+.disclaimer-popup {
+    background: var(--secondary-bg); /* Darker than panel-bg for contrast */
+    padding: 25px 30px;
+    border-radius: 8px;
+    border: 2px solid var(--warning-color);
+    box-shadow: 0 0 20px rgba(255, 188, 44, 0.4), 0 0 40px rgba(255, 188, 44, 0.2); /* Enhanced shadow */
+    width: 90%; /* Adjusted from 95% for better edge spacing */
+    max-width: 550px; /* Slightly wider */
+    text-align: left;
+    position: relative;
+    color: var(--text-color);
+    animation: disclaimerFadeIn 0.3s ease-out;
+    overflow-wrap: break-word; /* Ensure long words in text content break correctly */
+    max-height: 90vh; /* Ensures it fits vertically on all screens */
+    overflow-y: auto; /* Allows scrolling for long content on all screens */
+}
+
+@keyframes disclaimerFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.disclaimer-popup h3 {
+    color: var(--warning-color);
+    margin-bottom: 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    overflow-wrap: break-word; /* Also apply to headings if they could be long */
+}
+
+.disclaimer-popup p {
+    font-size: 14px;
+    margin-bottom: 15px;
+    line-height: 1.7;
+    color: var(--muted-text);
+}
+
+.disclaimer-popup p strong {
+    color: var(--text-color);
+    font-weight: 600; 
+}
+
+.disclaimer-popup .contact-info-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 15px;
+}
+
+.disclaimer-popup .contact-info-list li {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted-text);
+    overflow-wrap: break-word; /* Ensure text in list items wraps */
+}
+
+.disclaimer-popup .contact-info-list i {
+    color: var(--highlight-color);
+    width: 16px; 
+    text-align: center;
+}
+
+.disclaimer-popup .contact-info-list a {
+    color: var(--highlight-color);
+    text-decoration: none;
+    word-break: break-all; /* Keep for URLs */
+}
+
+.disclaimer-popup .contact-info-list a:hover {
+    text-decoration: underline;
+    color: var(--accent-color);
+}
+
+/* Official Channels styling in disclaimer */
+.disclaimer-popup .official-channels {
+    background: rgba(42, 48, 64, 0.5);
+    border-radius: 6px;
+    padding: 15px;
+    margin: 20px 0;
+    border-left: 3px solid var(--highlight-color);
+}
+
+.disclaimer-popup .official-channels h4 {
+    color: var(--highlight-color);
+    font-size: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.disclaimer-popup .channels-intro {
+    font-size: 14px;
+    margin-bottom: 15px;
+    color: var(--muted-text);
+}
+
+.disclaimer-popup .social-links-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+}
+
+.disclaimer-popup .social-item {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: rgba(0, 196, 255, 0.08);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s ease;
+}
+
+.disclaimer-popup .social-item:hover {
+    background: rgba(0, 196, 255, 0.15);
+}
+
+.disclaimer-popup .social-item i {
+    color: var(--highlight-color);
+    width: 20px;
+    font-size: 18px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.disclaimer-popup .social-label {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-right: 8px;
+}
+
+.disclaimer-popup .social-item a {
+    color: var(--highlight-color);
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.disclaimer-popup .social-item a:hover {
+    text-decoration: underline;
+    color: var(--accent-color);
+}
+
+.disclaimer-popup .verification-note {
+    font-size: 13px;
+    color: var(--warning-color);
+    text-align: center;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.disclaimer-popup .verification-note i {
+    margin-right: 5px;
+}
+
+.disclaimer-popup .disclaimer-note {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--warning-color);
+    opacity: 0.9;
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.disclaimer-popup .disclaimer-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(42, 48, 64, 0.7);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 22px;
+    font-weight: normal;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 5;
+}
+
+.disclaimer-popup .disclaimer-close-btn:hover {
+    color: var(--warning-color);
+    background: var(--secondary-bg);
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(255, 188, 44, 0.3);
+}
+
+.disclaimer-popup .disclaimer-close-btn:active {
+    transform: scale(0.95);
 }
 
 /* Responsiveness */
@@ -740,5 +1020,63 @@ body::after {
         margin-top: 5px;
         justify-content: center;
         width: 100%;
+    }
+
+    /* Responsive adjustments for disclaimer popup */
+    .disclaimer-popup {
+        padding: 15px; /* Further reduced padding */
+        width: 90%; /* Maintains consistent width percentage */
+    }
+    .disclaimer-popup h3 {
+        font-size: 16px;
+        gap: 8px; /* Reduced gap */
+        padding-bottom: 8px; /* Adjusted padding */
+        margin-bottom: 15px; /* Adjusted margin */
+    }
+    .disclaimer-popup p {
+        font-size: 13px;
+        margin-bottom: 12px; /* Adjusted margin */
+    }
+    .disclaimer-popup .contact-info-list li {
+        font-size: 13px;
+        gap: 5px; /* Reduced gap */
+        margin-bottom: 6px; /* Adjusted margin */
+    }
+    .disclaimer-popup .disclaimer-note {
+        font-size: 12px; /* Slightly smaller note text */
+        margin-top: 15px; /* Adjusted margin */
+        padding-top: 10px; /* Adjusted padding */
+    }
+    .disclaimer-popup .disclaimer-close-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+        top: 10px;
+        right: 10px;
+    }
+    .disclaimer-popup .official-channels {
+        padding: 10px;
+        margin: 15px 0;
+    }
+    .disclaimer-popup .official-channels h4 {
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+    .disclaimer-popup .channels-intro {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+    .disclaimer-popup .social-item {
+        padding: 6px 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .disclaimer-popup .social-item i {
+        width: 16px;
+        font-size: 16px;
+        margin-right: 8px;
+    }
+    .disclaimer-popup .verification-note {
+        font-size: 12px;
     }
 }

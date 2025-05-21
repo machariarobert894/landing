@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIGIT//MATCH - Market Signal Tool</title>
-    <!-- Favicon -->
-    <link rel="icon" href="../images/icons/deriv lite logo.png" type="image/png">
     <link rel="stylesheet" href="../css/tools.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- PWA Manifest Link -->
@@ -163,7 +161,12 @@
                     </div>
                     <div class="input-group">
                         <label for="password"><i class="fas fa-key"></i> Password:</label>
-                        <input type="password" id="password" name="password" required>
+                        <div class="password-container">
+                            <input type="password" id="password" name="password" required>
+                            <button type="button" class="password-toggle" data-target="password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" class="btn primary btn-login"><i class="fas fa-sign-in-alt"></i> Login</button>
                     <div id="loginError" class="login-error"></div>
@@ -184,16 +187,70 @@
                     </div>
                     <div class="input-group">
                         <label for="regPassword"><i class="fas fa-key"></i> Password:</label>
-                        <input type="password" id="regPassword" name="regPassword" required>
+                        <div class="password-container">
+                            <input type="password" id="regPassword" name="regPassword" required>
+                            <button type="button" class="password-toggle" data-target="regPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label for="regConfirmPassword"><i class="fas fa-check-double"></i> Confirm Password:</label>
-                        <input type="password" id="regConfirmPassword" name="regConfirmPassword" required>
+                        <div class="password-container">
+                            <input type="password" id="regConfirmPassword" name="regConfirmPassword" required>
+                            <button type="button" class="password-toggle" data-target="regConfirmPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" class="btn primary btn-register"><i class="fas fa-user-plus"></i> Create Account</button>
                     <div id="registerError" class="login-error"></div>
                 </form>
             </div>
+
+            <div class="disclaimer-trigger-container">
+                <a href="#" id="disclaimerLink" class="disclaimer-link">
+                    <i class="fas fa-info-circle"></i> Important Disclaimer
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Disclaimer Modal -->
+    <div id="disclaimerOverlay" class="disclaimer-overlay" style="display: none;">
+        <div class="disclaimer-popup">
+            <button id="closeDisclaimerPopup" class="close-btn disclaimer-close-btn">&times;</button>
+            <h3><i class="fas fa-exclamation-triangle"></i> Important Disclaimer</h3>
+            
+            <div class="official-channels">
+                <h4><i class="fas fa-id-badge"></i> Official Channels</h4>
+                <p class="channels-intro">For support, updates, and official content, please only use these verified channels:</p>
+                <ul class="social-links-list">
+                    <li class="social-item">
+                        <i class="fab fa-instagram"></i>
+                        <span class="social-label">Instagram:</span>
+                        <a href="https://www.instagram.com/derivlite.com_/" target="_blank" rel="noopener noreferrer">@derivlite.com_</a>
+                    </li>
+                    <li class="social-item">
+                        <i class="fab fa-tiktok"></i>
+                        <span class="social-label">TikTok:</span>
+                        <a href="https://www.tiktok.com/@derivlite.com" target="_blank" rel="noopener noreferrer">@derivlite.com</a>
+                    </li>
+                    <li class="social-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span class="social-label">Support:</span>
+                        <a href="tel:+254714653438">+254714653438</a>
+                    </li>
+                </ul>
+                <p class="verification-note"><i class="fas fa-shield-alt"></i> Always verify you're using our official channels. We will never contact you from different accounts.</p>
+            </div>
+            
+            <p><strong>Affiliation & API Usage:</strong> DIGIT//MATCH (derivlite.com) is an independent entity. We utilize the official Deriv API to provide market data and analysis. We are also an Introducing Broker (IB) for Deriv. However, we are not otherwise affiliated with, endorsed by, or in any way officially connected with Deriv Limited or its other brands (e.g., Binary.com™) beyond this stated API usage and IB relationship, nor any other brokers, companies, or individuals, except where explicitly stated.</p>
+            <p><strong>Trademarks:</strong> Deriv™ and Binary.com™ are trademarks of Deriv Limited. Any other product names, logos, brands, and other trademarks or images featured or referred to within the DIGIT//MATCH website and/or on any social media forum are the property of their respective trademark holders. These trademark holders are not affiliated with DIGIT//MATCH, our products, or our websites, other than our disclosed use of the Deriv API and IB status. They do not sponsor or endorse our materials unless explicitly stated.</p>
+            <p><strong>Risk Warning:</strong> This tool is provided for informational and educational purposes only. Trading financial markets, including derivatives, involves a substantial risk of loss and is not suitable for all investors. Past performance is not indicative of future results. Use this tool and any information provided at your own discretion and risk. We are not responsible for any financial losses incurred. Ensure you understand the risks involved before trading.</p>
+            
+            <p class="disclaimer-note">By using this tool, you acknowledge and agree to this disclaimer.</p>
         </div>
     </div>
 
@@ -350,6 +407,11 @@
             const registerForm = document.getElementById('registerForm');
             const loginError = document.getElementById('loginError');
             const registerError = document.getElementById('registerError');
+
+            // Disclaimer Modal Elements
+            const disclaimerLink = document.getElementById('disclaimerLink');
+            const disclaimerOverlay = document.getElementById('disclaimerOverlay');
+            const closeDisclaimerPopup = document.getElementById('closeDisclaimerPopup');
             
             // Payment Modal Elements
             const paymentOverlay = document.getElementById('paymentOverlay');
@@ -371,6 +433,39 @@
             authStyles.href = '../css/auth.css';
             document.head.appendChild(authStyles);
 
+            // Disclaimer Popup Logic
+            if (disclaimerLink && disclaimerOverlay && closeDisclaimerPopup) {
+                disclaimerLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    disclaimerOverlay.style.display = 'flex';
+                });
+
+                closeDisclaimerPopup.addEventListener('click', function() {
+                    disclaimerOverlay.style.display = 'none';
+                });
+
+                // Close disclaimer by clicking on the overlay background
+                disclaimerOverlay.addEventListener('click', function(e) {
+                    if (e.target === disclaimerOverlay) {
+                        disclaimerOverlay.style.display = 'none';
+                    }
+                });
+            }
+
+            // Payment Popup Logic
+            if (closePaymentPopup && paymentOverlay) {
+                closePaymentPopup.addEventListener('click', function() {
+                    paymentOverlay.style.display = 'none';
+                });
+                
+                // Close payment popup by clicking on the overlay background
+                paymentOverlay.addEventListener('click', function(e) {
+                    if (e.target === paymentOverlay) {
+                        paymentOverlay.style.display = 'none';
+                    }
+                });
+            }
+
             // Tab switching functionality
             loginTabBtn.addEventListener('click', function() {
                 loginTabBtn.classList.add('active');
@@ -390,7 +485,7 @@
             async function checkLogin(username, password) {
                 try {
                     // Fix the API URL (removing the space and using correct endpoint)
-                    const apiUrl = 'https://binaryfx.site/api/1.1/obj/derivlite_users';
+                    const apiUrl = 'https://binaryfx.site/version-test/api/1.1/obj/derivlite_users';
                     
                     const response = await fetch(apiUrl);
 
@@ -426,7 +521,8 @@
                         username: foundUser.username_text,
                         role: foundUser.role || 'user',
                         email: foundUser.email_text || '',
-                        inactive: foundUser.active_boolean === false
+                        inactive: foundUser.active_boolean === false,
+                        unique_id_text: foundUser.unique_id_text || null // Add unique_id_text to the returned user object
                     } : null;
                     
                 } catch (error) {
@@ -436,27 +532,47 @@
                 }
             }
 
+            // Function to generate unique 12-digit ID
+            function generateUniqueId() {
+                const timestamp = new Date().getTime().toString().slice(-10);
+                const random = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+                return timestamp + random;
+            }
+
             // Register new user function
-            async function registerUser(username, email, password) {
+            async function registerUser(username, email, password, uniqueId) {
                 try {
-                    const response = await fetch('../users.json');
+                    // First check if the username or email already exists using the login API
+                    const apiUrl = 'https://binaryfx.site/version-test/api/1.1/obj/derivlite_users';
+                    const response = await fetch(apiUrl);
+                    
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                    const users = await response.json();
                     
-                    if (users.some(user => user.username === username)) {
+                    const data = await response.json();
+                    
+                    if (!data.response || !data.response.results) {
+                        console.error("Unexpected API response structure:", data);
+                        return { success: false, message: 'Registration system error (API response format).' };
+                    }
+                    
+                    const users = data.response.results;
+                    
+                    // Check if username exists
+                    if (users.some(user => user.username_text === username)) {
                         return { success: false, message: 'Username already exists' };
                     }
                     
-                    if (users.some(user => user.email === email)) {
+                    // Check if email exists
+                    if (users.some(user => user.email_text === email)) {
                         return { success: false, message: 'Email already in use' };
                     }
                     
                     addLog(`[SYSTEM] Initializing account for ${username}...`);
                     
                     try {
-                        const apiResponse = await fetch('https://binaryfx.site/api/1.1/wf/derivlite', {
+                        const apiResponse = await fetch('https://binaryfx.site/version-test/api/1.1/wf/derivlite',  {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -465,6 +581,7 @@
                                 username: username,
                                 email: email,
                                 password: password,
+                                unique_id: uniqueId,
                                 registration_source: 'web_app',
                                 registration_time: new Date().toISOString()
                             })
@@ -494,6 +611,24 @@
                     } catch (apiError) {
                         addLog(`[ERROR] Cannot reach registration API: ${apiError.message}`, 'alert');
                         
+                        // Fallback to local validation if API registration fails
+                        try {
+                            const localResponse = await fetch('../users.json');
+                            if (localResponse.ok) {
+                                const localUsers = await localResponse.json();
+                                
+                                if (localUsers.some(user => user.username === username)) {
+                                    return { success: false, message: 'Username already exists (local check)' };
+                                }
+                                
+                                if (localUsers.some(user => user.email === email)) {
+                                    return { success: false, message: 'Email already in use (local check)' };
+                                }
+                            }
+                        } catch (localError) {
+                            console.error("Local validation also failed:", localError);
+                        }
+                        
                         return { 
                             success: true, 
                             user: { 
@@ -506,11 +641,30 @@
                     }
                 } catch (error) {
                     console.error("Error during registration:", error);
+                    
+                    // Fallback to local file check if API fails completely
+                    try {
+                        const response = await fetch('../users.json');
+                        if (response.ok) {
+                            const users = await response.json();
+                            
+                            if (users.some(user => user.username === username)) {
+                                return { success: false, message: 'Username already exists' };
+                            }
+                            
+                            if (users.some(user => user.email === email)) {
+                                return { success: false, message: 'Email already in use' };
+                            }
+                        }
+                    } catch (fallbackError) {
+                        console.error("Fallback validation failed:", fallbackError);
+                    }
+                    
                     return { success: false, message: 'Registration system error. Please try again later.' };
                 }
             }
 
-            // Login form submission - MODIFIED to handle inactive accounts
+            // Login form submission - MODIFIED to handle inactive accounts and device verification
             loginForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
                 const username = document.getElementById('username').value.trim();
@@ -520,6 +674,7 @@
                 const loginResult = await checkLogin(username, password);
 
                 if (loginResult) {
+                    // Check if account is inactive
                     if (loginResult.inactive) {
                         // Update the payment popup content for inactive accounts
                         const paymentTitle = paymentOverlay.querySelector('h3');
@@ -538,8 +693,53 @@
                         
                         // Log the inactive account attempt
                         addLog(`[ACCESS] Login attempt by inactive account: ${loginResult.username}`, 'alert');
-                    } else {
-                        // Active account - proceed with login
+                    } 
+                    // Check if unique_id_text exists in the user record and in localStorage
+                    else if (loginResult.unique_id_text) {
+                        const storedUniqueId = localStorage.getItem('userUniqueId');
+                        
+                        // Just check if IDs match, no editing
+                        if (storedUniqueId !== loginResult.unique_id_text) {
+                            // Update the payment popup content for device restriction error
+                            const paymentTitle = paymentOverlay.querySelector('h3');
+                            const paymentText = paymentOverlay.querySelectorAll('p');
+                            const paymentLink = paymentOverlay.querySelector('.payment-link');
+                            
+                            paymentTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Device Restriction';
+                            paymentText[0].innerHTML = `Your account <strong>${loginResult.username}</strong> is already in use on another device.`;
+                            
+                            // Hide the payment link for device restriction errors
+                            paymentLink.style.display = 'none';
+                            
+                            paymentText[1].innerHTML = 'Please use the same device you used to create this account to access this tool. Each account is restricted to a single device for security reasons.';
+                            
+                            // Show the payment popup directly
+                            paymentOverlay.style.display = 'flex';
+                            
+                            // Add an error in the login form as well
+                            loginError.textContent = 'This account is already in use in another device.';
+                            loginError.style.color = '#ff5252';
+                            
+                            // Log the access attempt
+                            addLog(`[ACCESS] Login attempt from unauthorized device for account: ${loginResult.username}`, 'alert');
+                            return;
+                        }
+                        
+                        // Active account with valid device - proceed with login
+                        loginOverlay.style.display = 'none';
+                        sessionStorage.setItem('loggedInUser', loginResult.username);
+
+                        if (loginResult.role === 'admin') {
+                            adminLink.style.display = 'inline-flex';
+                            adminLink.href = '../admin/admin.html';
+                        } else {
+                            adminLink.style.display = 'none';
+                        }
+
+                        initializeTool();
+                    } 
+                    else {
+                        // Legacy account without unique_id_text - proceed with login
                         loginOverlay.style.display = 'none';
                         sessionStorage.setItem('loggedInUser', loginResult.username);
 
@@ -580,12 +780,18 @@
                     return;
                 }
 
+                // Generate unique ID and store in localStorage
+                const uniqueId = generateUniqueId();
+                localStorage.setItem('userUniqueId', uniqueId);
+                
+                addLog(`[SYSTEM] Generated unique ID for registration: ${uniqueId}`);
+
                 const registerButton = this.querySelector('.btn-register');
                 const originalButtonText = registerButton.innerHTML;
                 registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
                 registerButton.disabled = true;
 
-                const registerResult = await registerUser(username, email, password);
+                const registerResult = await registerUser(username, email, password, uniqueId);
 
                 registerButton.innerHTML = originalButtonText;
                 registerButton.disabled = false;
@@ -863,6 +1069,15 @@
                     }, 500);
                 }
             });
+            
+            // Close iframe button handler
+            if (closeIframeButton && tradeIframeContainer) {
+                closeIframeButton.addEventListener('click', function() {
+                    tradeIframeContainer.style.display = 'none';
+                    tradeIframe.src = 'about:blank';
+                    dashboard.classList.remove('with-trading-platform');
+                });
+            }
             
             // Function to fix iframe height issues
             function fixIframeHeight() {
@@ -1182,6 +1397,24 @@
                 if (tradeIframeContainer.style.display === 'flex') {
                     fixIframeHeight();
                 }
+            });
+
+            // Password toggle functionality
+            const passwordToggles = document.querySelectorAll('.password-toggle');
+            
+            passwordToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    } else {
+                        passwordInput.type = 'password';
+                        this.innerHTML = '<i class="fas fa-eye"></i>';
+                    }
+                });
             });
         });
 
