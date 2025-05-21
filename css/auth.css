@@ -60,3 +60,21 @@
     margin-top: 10px;
     text-align: center;
 }
+
+/* Add these styles to ensure email input matches username styling */
+.auth-form-container input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.auth-form-container input[type="email"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(0, 255, 157, 0.4);
+}
