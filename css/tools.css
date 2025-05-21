@@ -923,6 +923,74 @@ body::after {
     transform: scale(0.95);
 }
 
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--highlight-color);
+    box-shadow: 0 0 8px rgba(0, 196, 255, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--secondary-bg);
+}
+
+/* Custom Scrollbar for Terminal */
+.terminal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.terminal::-webkit-scrollbar-thumb {
+    background: rgba(0, 196, 255, 0.3);
+}
+
+.terminal::-webkit-scrollbar-thumb:hover {
+    background: var(--highlight-color);
+    box-shadow: 0 0 8px rgba(0, 196, 255, 0.7);
+}
+
+/* Custom Scrollbar for Disclaimer Popup */
+.disclaimer-popup::-webkit-scrollbar {
+    width: 7px;
+}
+
+.disclaimer-popup::-webkit-scrollbar-thumb {
+    background: rgba(255, 188, 44, 0.3);
+}
+
+.disclaimer-popup::-webkit-scrollbar-thumb:hover {
+    background: var(--warning-color);
+    box-shadow: 0 0 8px rgba(255, 188, 44, 0.7);
+}
+
+/* Firefox Scrollbar (more limited styling options) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) var(--secondary-bg);
+}
+
+.terminal {
+    scrollbar-color: rgba(0, 196, 255, 0.3) var(--secondary-bg);
+}
+
+.disclaimer-popup {
+    scrollbar-color: rgba(255, 188, 44, 0.3) var(--secondary-bg);
+}
+
 /* Responsiveness */
 @media (max-width: 1200px) {
     .dashboard {
@@ -1078,5 +1146,18 @@ body::after {
     }
     .disclaimer-popup .verification-note {
         font-size: 12px;
+    }
+
+    ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+    
+    .terminal::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .disclaimer-popup::-webkit-scrollbar {
+        width: 5px;
     }
 }
