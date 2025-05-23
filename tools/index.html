@@ -140,6 +140,111 @@
                 margin-bottom: 0;
             }
         }
+        
+        /* Bot Download Section Styles */
+        .bot-download-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+        
+        .bot-download-section h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--accent-color);
+        }
+        
+        .bot-description {
+            font-size: 13px;
+            margin-bottom: 15px;
+            color: var(--muted-text);
+            line-height: 1.4;
+        }
+        
+        .download-btn {
+            background: rgba(0, 255, 157, 0.15);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        
+        .download-btn:hover {
+            background: rgba(0, 255, 157, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .bot-info {
+            background: var(--secondary-bg);
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 12px;
+        }
+        
+        .bot-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        
+        .bot-info-item i {
+            color: var(--highlight-color);
+            width: 14px;
+            text-align: center;
+        }
+        
+        /* Add the @media query before the closing bracket */
+        @media screen and (max-width: 768px) {
+            /* Trading iFrame Container - MODIFIED for better responsive sizing */
+            .trade-iframe-container {
+                display: none;
+                position: fixed;
+                top: 90px; /* Position below header */
+                right: 20px;
+                width: 90%; /* Wider on small screens */
+                height: min(40vh, 400px); /* Limit height on small screens */
+                max-height: 60vh;
+                top: auto;
+                bottom: 20px;
+                left: 5%;
+                min-width: 280px;
+                min-height: 200px;
+            }
+            
+            /* Ensure iframe contents scale properly */
+            #tradeIframe {
+                height: calc(100% - 40px);
+                width: 100%;
+            }
+            
+            .dashboard.with-trading-platform {
+                width: 100%;
+                margin-bottom: 0;
+            }
+            
+            .bot-download-section h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .bot-description {
+                font-size: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .download-btn {
+                padding: 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -345,6 +450,23 @@
                         <div class="confidence-label">Frequency: 0%</div>
                         <div class="meter-bar">
                             <div class="meter-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bot Download Section -->
+                <div class="bot-download-section">
+                    <h3><i class="fas fa-robot"></i> Auto Trading Bot</h3>
+                    <p class="bot-description">Download our optimized trading bot to automate your trades based on these signals.</p>
+                    <a href="../Poverty killer.xml" download="Poverty killer.xml" class="btn download-btn">
+                        <i class="fas fa-download"></i> Download Bot
+                    </a>
+                    <div class="bot-info">
+                        <div class="bot-info-item">
+                            <i class="fas fa-code"></i> Bot Type: Matches Strategy
+                        </div>
+                        <div class="bot-info-item">
+                            <i class="fas fa-chart-line"></i> Market: All Volatility indices
                         </div>
                     </div>
                 </div>
