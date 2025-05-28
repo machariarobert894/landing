@@ -245,6 +245,128 @@
                 padding: 8px;
             }
         }
+        
+        /* Discount Code Styles */
+        .discount-code-section {
+            background: var(--secondary-bg);
+            border-radius: 5px;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px dashed var(--border-color);
+        }
+        
+        .discount-input-group {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .discount-code-input {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s;
+        }
+        
+        .discount-code-input:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+            box-shadow: 0 0 0 2px rgba(0, 196, 255, 0.2);
+        }
+        
+        .discount-code-input::placeholder {
+            color: var(--muted-text);
+            opacity: 0.7;
+        }
+        
+        .discount-btn {
+            background: rgba(0, 196, 255, 0.15);
+            border-color: var(--highlight-color);
+            color: var(--highlight-color);
+            padding: 8px 16px;
+            font-weight: bold;
+        }
+        
+        .discount-btn:hover {
+            background: rgba(0, 196, 255, 0.25);
+            box-shadow: 0 0 10px rgba(0, 196, 255, 0.3);
+        }
+        
+        .discount-message {
+            margin-top: 8px;
+            font-size: 13px;
+            min-height: 18px;
+        }
+        
+        .discount-error {
+            color: var(--danger-color);
+        }
+        
+        .discount-success {
+            color: var(--success-color);
+        }
+        
+        .discount-applied {
+            color: var(--success-color);
+            font-style: italic;
+        }
+        
+        .discount-contact {
+            font-size: 12px;
+            margin-top: 8px;
+            color: var(--muted-text);
+            text-align: center;
+            border-top: 1px dotted var(--border-color);
+            padding-top: 8px;
+            margin-bottom: 0;
+        }
+        
+        .discount-contact a {
+            color: var(--highlight-color);
+            text-decoration: none;
+        }
+        
+        .discount-contact a:hover {
+            text-decoration: underline;
+        }
+        
+        .discount-input-success {
+            border-color: var(--success-color) !important;
+            box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.2) !important;
+        }
+        
+        .discount-input-error {
+            border-color: var(--danger-color) !important;
+            box-shadow: 0 0 0 2px rgba(255, 82, 82, 0.2) !important;
+            animation: errorShake 0.4s ease-in-out;
+        }
+        
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        
+        /* Responsive styles for discount section */
+        @media screen and (max-width: 768px) {
+            .discount-input-group {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .discount-btn {
+                width: 100%;
+            }
+            
+            .discount-code-section {
+                padding: 10px;
+                margin: 12px 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -364,10 +486,21 @@
         <div class="payment-popup">
             <button id="closePaymentPopup" class="close-btn">&times;</button>
             <h3><i class="fab fa-bitcoin"></i> Payment Request</h3>
-            <p>Derivlite has requested <strong>250 USDT</strong> payment. Tap the link below to complete the payment via Binance:</p>
-            <a href="https://s.binance.com/XwEaudt4" target="_blank" class="payment-link">
+            <p class="payment-amount">Derivlite has requested <strong>250 USDT</strong> payment. Tap the link below to complete the payment via Binance:</p>
+            
+            <a href="https://s.binance.com/XwEaudt4" target="_blank" id="paymentLink" class="payment-link">
                 https://s.binance.com/R29up4mZ
             </a>
+            
+            <!-- Discount code section -->
+            <div class="discount-code-section">
+                <div class="discount-input-group">
+                    <input type="text" id="discountCode" placeholder="Enter discount code" class="discount-code-input">
+                    <button id="applyDiscountBtn" class="btn discount-btn">Apply</button>
+                </div>
+                <div id="discountMessage" class="discount-message"></div>
+                <p class="discount-contact">Contact <a href="tel:0740009453">0740009453</a> for a discount code</p>
+            </div>
             <p>After payment, contact support to receive your login credentials.</p>
         </div>
     </div>
@@ -1568,6 +1701,78 @@
                         this.innerHTML = '<i class="fas fa-eye"></i>';
                     }
                 });
+            });
+            
+            // Discount code functionality
+            const discountCodeInput = document.getElementById('discountCode');
+            const applyDiscountBtn = document.getElementById('applyDiscountBtn');
+            const discountMessage = document.getElementById('discountMessage');
+            const paymentAmount = document.querySelector('.payment-amount');
+            const paymentLink = document.getElementById('paymentLink');
+
+            // Define discount codes
+            const discountCodes = {
+                'YBXCT': {
+                    percentage: 30,
+                    amount: 175,
+                    link: 'https://s.binance.com/7zOgo0mM'
+                },
+                'YIBVUIE': {
+                    percentage: 50,
+                    amount: 125,
+                    link: 'https://s.binance.com/ZwLXdnob'
+                }
+            };
+
+            // Apply discount code handler
+            applyDiscountBtn.addEventListener('click', function() {
+                const code = discountCodeInput.value.trim().toUpperCase();
+                
+                // Reset styles
+                discountMessage.className = 'discount-message';
+                discountCodeInput.classList.remove('discount-input-error', 'discount-input-success');
+                
+                if (!code) {
+                    discountMessage.textContent = 'Please enter a discount code';
+                    discountMessage.classList.add('discount-error');
+                    return;
+                }
+                
+                const discount = discountCodes[code];
+                if (discount) {
+                    // Update payment amount and link
+                    paymentAmount.innerHTML = `Derivlite has requested <strong>${discount.amount} USDT</strong> payment (<span class="discount-applied">${discount.percentage}% discount applied</span>). Tap the link below to complete the payment via Binance:`;
+                    paymentLink.href = discount.link;
+                    paymentLink.textContent = discount.link;
+                    
+                    // Show success message
+                    discountMessage.textContent = `${discount.percentage}% discount applied successfully!`;
+                    discountMessage.classList.add('discount-success');
+                    discountCodeInput.classList.add('discount-input-success');
+                    
+                    // Log success
+                    addLog(`[PAYMENT] Discount code applied: ${code} (${discount.percentage}% off)`, 'success');
+                } else {
+                    // Reset to original values
+                    paymentAmount.innerHTML = `Derivlite has requested <strong>250 USDT</strong> payment. Tap the link below to complete the payment via Binance:`;
+                    paymentLink.href = 'https://s.binance.com/XwEaudt4';
+                    paymentLink.textContent = 'https://s.binance.com/R29up4mZ';
+                    
+                    // Show error message
+                    discountMessage.textContent = 'Invalid discount code. Please try again or contact support.';
+                    discountMessage.classList.add('discount-error');
+                    discountCodeInput.classList.add('discount-input-error');
+                    
+                    // Log error
+                    addLog(`[PAYMENT] Invalid discount code attempt: ${code}`, 'alert');
+                }
+            });
+
+            // Allow Enter key to submit discount code
+            discountCodeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    applyDiscountBtn.click();
+                }
             });
         });
 
