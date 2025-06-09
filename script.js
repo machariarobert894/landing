@@ -2,46 +2,225 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mobile menu toggle
     const mobileToggle = document.querySelector('.mobile-toggle');
     const nav = document.querySelector('nav');
+    const body = document.body;
     
-    mobileToggle.addEventListener('click', () => {
+    // Create overlay if it doesn't exist
+    let overlay = document.querySelector('.overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'overlay';
+        document.body.appendChild(overlay);
+    }
+    
+    // Handle menu toggle
+    function toggleMenu() {
         nav.classList.toggle('active');
         mobileToggle.classList.toggle('active');
+        overlay.classList.toggle('active');
+        
+        if (nav.classList.contains('active')) {
+            body.style.overflow = 'hidden';
+        } else {
+            body.style.overflow = '';
+        }
+    }
+    
+    mobileToggle.addEventListener('click', toggleMenu);
+    
+    // Close menu when clicking overlay
+    overlay.addEventListener('click', () => {
+        nav.classList.remove('active');
+        mobileToggle.classList.remove('active');
+        overlay.classList.remove('active');
+        body.style.overflow = '';
     });
     
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
+    // Close menu when pressing escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && nav.classList.contains('active')) {
+            nav.classList.remove('active');
+            mobileToggle.classList.remove('active');
+            overlay.classList.remove('active');
+            body.style.overflow = '';
+        }
+    });
+    
+    // Enhanced dropdown behavior for mobile
+    const dropdownLinks = document.querySelectorAll('.dropdown > a');
+    const dropdowns = document.querySelectorAll('.dropdown');
+    
+    // Create toggle buttons for dropdowns
+    dropdowns.forEach(dropdown => {
+        if (window.innerWidth <= 992) {
+            // Check if toggle button already exists
+            let toggleBtn = dropdown.querySelector('.dropdown-toggle');
             
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-                window.scrollTo({
-                    top: targetElement.offsetTop - 80,
-                    behavior: 'smooth'
+            if (!toggleBtn) {
+                toggleBtn = document.createElement('span');
+                toggleBtn.className = 'dropdown-toggle';
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                dropdown.appendChild(toggleBtn);
+                
+                // Handle toggle click
+                toggleBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const content = dropdown.querySelector('.dropdown-content');
+                    const isOpen = content.style.display === 'block';
+                    
+                    // Close all other dropdowns
+                    dropdowns.forEach(d => {
+                        if (d !== dropdown) {
+                            const c = d.querySelector('.dropdown-content');
+                            const t = d.querySelector('.dropdown-toggle i');
+                            if (c) c.style.display = 'none';
+                            if (t) t.className = 'fas fa-chevron-down';
+                        }
+                    });
+                    
+                    // Toggle current dropdown
+                    content.style.display = isOpen ? 'none' : 'block';
+                    toggleBtn.querySelector('i').className = isOpen ? 
+                        'fas fa-chevron-down' : 'fas fa-chevron-up';
+                });
+            }
+        }
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 992) {
+            const isDropdownClick = e.target.closest('.dropdown');
+            if (!isDropdownClick) {
+                dropdowns.forEach(dropdown => {
+                    const content = dropdown.querySelector('.dropdown-content');
+                    const toggle = dropdown.querySelector('.dropdown-toggle i');
+                    if (content) content.style.display = 'none';
+                    if (toggle) toggle.className = 'fas fa-chevron-down';
+                });
+            }
+        }
+    });
+    
+    // Prevent dropdown links from navigating on mobile
+    dropdownLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (window.innerWidth <= 992) {
+                e.preventDefault();
+                const dropdown = link.parentElement;
+                const content = dropdown.querySelector('.dropdown-content');
+                const toggle = dropdown.querySelector('.dropdown-toggle i');
+                
+                // Close all other dropdowns
+                dropdowns.forEach(d => {
+                    if (d !== dropdown) {
+                        const c = d.querySelector('.dropdown-content');
+                        const t = d.querySelector('.dropdown-toggle i');
+                        if (c) c.style.display = 'none';
+                        if (t) t.className = 'fas fa-chevron-down';
+                    }
                 });
                 
-                // Close mobile menu if open
-                if (window.innerWidth < 992) {
-                    nav.classList.remove('active');
-                    mobileToggle.classList.remove('active');
-                }
+                // Toggle current dropdown
+                const isOpen = content.style.display === 'block';
+                content.style.display = isOpen ? 'none' : 'block';
+                if (toggle) toggle.className = isOpen ? 
+                    'fas fa-chevron-down' : 'fas fa-chevron-up';
             }
         });
     });
     
-    // Sticky header with improved animation
+    // Enhanced smooth scrolling with proper offset
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('href');
+            
+            // Skip dropdown parent links
+            if (window.innerWidth <= 992 && this.parentElement.classList.contains('dropdown')) {
+                return;
+            }
+            
+            if (targetId === '#' || targetId === '#markets') {
+                return;
+            }
+            
+            e.preventDefault();
+            
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                // Close mobile menu if open
+                if (nav.classList.contains('active')) {
+                    nav.classList.remove('active');
+                    mobileToggle.classList.remove('active');
+                    overlay.classList.remove('active');
+                    body.style.overflow = '';
+                }
+                
+                // Calculate proper offset based on header height
+                const headerHeight = document.querySelector('header').offsetHeight;
+                const offsetTop = targetElement.offsetTop - headerHeight - 10;
+                
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // Handle window resize events
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+            // Reset for larger screens
+            nav.classList.remove('active');
+            mobileToggle.classList.remove('active');
+            overlay.classList.remove('active');
+            body.style.overflow = '';
+            
+            // Show dropdown content normally
+            document.querySelectorAll('.dropdown-content').forEach(content => {
+                content.style.display = '';
+            });
+        } else {
+            // Setup for mobile screens
+            document.querySelectorAll('.dropdown').forEach(dropdown => {
+                if (!dropdown.querySelector('.dropdown-toggle')) {
+                    const toggleBtn = document.createElement('span');
+                    toggleBtn.className = 'dropdown-toggle';
+                    toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                    dropdown.appendChild(toggleBtn);
+                    
+                    toggleBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const content = dropdown.querySelector('.dropdown-content');
+                        const isOpen = content.style.display === 'block';
+                        content.style.display = isOpen ? 'none' : 'block';
+                        toggleBtn.querySelector('i').className = isOpen ? 
+                            'fas fa-chevron-down' : 'fas fa-chevron-up';
+                    });
+                }
+            });
+        }
+    });
+    
+    // Sticky header handling
     const header = document.querySelector('header');
-    const headerHeight = header.offsetHeight;
     
     window.addEventListener('scroll', () => {
-        if (window.scrollY > headerHeight) {
+        if (window.scrollY > 50) {
             header.classList.add('sticky');
         } else {
             header.classList.remove('sticky');
         }
     });
+    
+    // Initialize sticky header state
+    if (window.scrollY > 50) {
+        header.classList.add('sticky');
+    }
     
     // Reveal elements on scroll
     const revealElements = document.querySelectorAll('.service-card, .about-content, .testimonial-item, .bot-card');

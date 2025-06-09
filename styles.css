@@ -28,12 +28,14 @@ body {
     color: var(--text-color);
     background-color: var(--light-color);
     overflow-x: hidden;
+    padding-top: 73px; /* Default header height */
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1200px; /* Fixed max-width instead of 100% */
     margin: 0 auto;
     padding: 0 25px;
+    width: 100%;
 }
 
 a {
@@ -130,7 +132,7 @@ ul {
     margin-top: 20px;
 }
 
-/* Header Styles */
+/* Header Styles - Improved mobile experience */
 header {
     background-color: var(--white);
     box-shadow: var(--box-shadow);
@@ -140,12 +142,7 @@ header {
     right: 0;
     z-index: 1000;
     transition: all 0.3s ease;
-}
-
-header.sticky {
-    padding: 5px 0;
-    background-color: var(--white);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
 }
 
 header .container {
@@ -153,8 +150,15 @@ header .container {
     justify-content: space-between;
     align-items: center;
     padding: 15px 25px;
+    position: relative;
 }
 
+header.sticky {
+    padding: 0;
+    max-width: 100%;
+}
+
+/* Logo Styles */
 .logo h1 {
     font-size: 24px;
     font-weight: 700;
@@ -164,6 +168,7 @@ header .container {
     color: var(--primary-color);
 }
 
+/* Navigation Styles */
 nav ul {
     display: flex;
     align-items: center;
@@ -243,18 +248,52 @@ nav ul li a:hover:after {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Mobile Toggle - Improved positioning and styling */
 .mobile-toggle {
     display: none;
     cursor: pointer;
+    z-index: 1010;
+    width: 30px;
+    height: 24px;
+    position: relative;
+    margin-left: auto; /* Ensures proper alignment */
 }
 
-.mobile-toggle span { /* Corrected selector: added dot before mobile-toggle */
+.mobile-toggle span {
     display: block;
-    width: 25px;
+    width: 100%;
     height: 2px;
     background-color: var(--dark-color);
-    margin: 6px 0;
-    transition: var(--transition);
+    position: absolute;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.mobile-toggle span:nth-child(1) {
+    top: 0;
+}
+
+.mobile-toggle span:nth-child(2) {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.mobile-toggle span:nth-child(3) {
+    bottom: 0;
+}
+
+.mobile-toggle.active span:nth-child(1) {
+    transform: rotate(45deg);
+    top: 10px;
+}
+
+.mobile-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg);
+    bottom: 10px;
 }
 
 /* Hero Section */
@@ -1559,14 +1598,6 @@ nav ul li a:hover:after {
     font-size: 15px;
 }
 
-.price-row.total {
-    border-top: 1px solid #e2e8f0;
-    margin-top: 10px;
-    padding-top: 15px;
-    font-weight: 600;
-    font-size: 18px;
-}
-
 /* Checkout Form */
 .checkout-form {
     background-color: var(--white);
@@ -2147,5 +2178,540 @@ footer {
     
     .certification-badges {
         justify-content: flex-start;
+    }
+}
+
+/* Mobile Toggle and Nav */
+.mobile-toggle {
+    display: none;
+    cursor: pointer;
+    z-index: 1010;
+    width: 30px;
+    height: 24px;
+    position: relative;
+    margin-left: auto; /* Ensures proper alignment */
+}
+
+.mobile-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: var(--dark-color);
+    position: absolute;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.mobile-toggle span:nth-child(1) {
+    top: 0;
+}
+
+.mobile-toggle span:nth-child(2) {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.mobile-toggle span:nth-child(3) {
+    bottom: 0;
+}
+
+.mobile-toggle.active span:nth-child(1) {
+    transform: rotate(45deg);
+    top: 10px;
+}
+
+.mobile-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg);
+    bottom: 10px;
+}
+
+/* Enhanced Mobile Nav Styles */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1005;
+}
+
+.overlay.active {
+    display: block;
+    animation: fadeIn 0.3s forwards;
+}
+
+@media (max-width: 992px) {
+    body {
+        padding-top: 64px; /* Smaller header height on mobile */
+    }
+    
+    header .container {
+        padding: 10px 15px;
+    }
+    
+    .logo {
+        z-index: 1010;
+    }
+    
+    .logo h1 {
+        font-size: 22px; /* Slightly smaller logo on mobile */
+    }
+    
+    .mobile-toggle {
+        display: block;
+    }
+    
+    nav {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 270px;
+        height: 100%;
+        background-color: var(--white);
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        padding: 75px 20px 30px;
+        overflow-y: auto;
+        transition: right 0.3s ease;
+        z-index: 1008; /* Below the toggle but above other content */
+    }
+    
+    nav.active {
+        right: 0;
+    }
+    
+    nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        width: 100%;
+    }
+    
+    nav ul li {
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 0;
+    }
+    
+    nav ul li a {
+        padding: 12px 0;
+        font-size: 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    nav ul li:last-child a {
+        border-bottom: none;
+    }
+    
+    nav ul li a.btn-primary {
+        margin-top: 10px;
+        margin-bottom: 5px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    nav ul li a:after {
+        display: none;
+    }
+    
+    .dropdown-content {
+        position: static;
+        box-shadow: none;
+        background-color: var(--light-color);
+        display: none;
+        padding: 5px 0 5px 15px;
+        margin: 0;
+        width: 100%;
+        animation: none;
+        border-left: 2px solid var(--primary-light);
+    }
+    
+    .dropdown-content a {
+        padding: 10px 15px;
+        font-size: 15px;
+    }
+    
+    /* Dropdown toggle button for mobile */
+    .dropdown-toggle {
+        position: absolute;
+        right: 0;
+        top: 12px; /* Better alignment */
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Adjust section padding more precisely */
+#hero {
+    padding-top: 0; /* Hero doesn't need extra padding - it has its own */
+    margin-top: 0;
+}
+
+section:not(#hero, #market-indicators) {
+    padding-top: 90px;
+    padding-bottom: 90px;
+    margin-top: 0;
+}
+
+#market-indicators {
+    padding-top: 73px !important;
+    padding-bottom: 15px;
+    margin-top: 0;
+}
+
+@media (max-width: 768px) {
+    section:not(#hero, #market-indicators) {
+        padding-top: 70px;
+        padding-bottom: 70px;
+    }
+    
+    #market-indicators {
+        padding-top: 64px !important;
+    }
+    
+    /* Further mobile refinements */
+    .hero-content h1 {
+        font-size: 32px;
+    }
+    
+    .hero-content p {
+        font-size: 16px;
+    }
+}
+
+/* Container fix - better responsiveness */
+.container {
+    max-width: 1200px; /* Fixed max-width instead of 100% */
+    margin: 0 auto;
+    padding: 0 25px;
+    width: 100%;
+}
+
+/* Improved body spacing */
+body {
+    // ...existing code...
+    overflow-x: hidden;
+    padding-top: 73px;
+}
+
+/* Improved header responsiveness */
+@media (max-width: 992px) {
+    header .container {
+        padding: 10px 15px;
+    }
+}
+
+/* Mobile navigation enhancements */
+@media (max-width: 992px) {
+    // ...existing code...
+    
+    nav {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 270px;
+        height: 100%;
+        background-color: var(--white);
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        padding: 75px 20px 30px;
+        overflow-y: auto;
+        transition: right 0.3s ease;
+        z-index: 1008;
+    }
+    
+    /* Improve dropdown positioning */
+    .dropdown-toggle {
+        position: absolute;
+        right: 0;
+        top: 12px; /* Better alignment */
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Enhanced Hero Section Responsiveness */
+@media (max-width: 768px) {
+    #hero {
+        height: auto;
+        min-height: 90vh;
+        padding: 100px 0 60px; /* Better padding for small screens */
+    }
+    
+    .hero-content h1 {
+        font-size: 32px;
+        margin-bottom: 16px;
+    }
+    
+    .hero-content p {
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 240px;
+        margin: 0 auto 30px;
+        gap: 15px;
+    }
+    
+    .hero-buttons a {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .hero-features {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+}
+
+/* Improved DMT Showcase Responsiveness */
+@media (max-width: 992px) {
+    .dmt-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .dmt-image {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .dmt-features-explained .btn-primary,
+    .dmt-features-explained .btn-secondary {
+        margin: 10px 0;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .dmt-features-explained h3 {
+        font-size: 24px;
+    }
+}
+
+/* Services Cards Responsive Fix */
+@media (max-width: 768px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+/* Trading Bots Responsive Improvements */
+@media (max-width: 992px) {
+    .bots-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .bot-card.featured {
+        transform: none;
+        grid-row: 1;
+    }
+    
+    .bot-card.featured:hover {
+        transform: translateY(-10px);
+    }
+}
+
+/* About Section Responsive Fix */
+@media (max-width: 992px) {
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .about-image {
+        order: -1;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .about-image:after {
+        display: none;
+    }
+    
+    .experience-badge {
+        bottom: -10px;
+        right: 10px;
+        width: 100px;
+        height: 100px;
+    }
+    
+    .experience-badge .years {
+        font-size: 28px;
+    }
+}
+
+/* Stats Section Responsiveness */
+@media (max-width: 992px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-item:nth-child(2)::after {
+        display: none;
+    }
+    
+    .stat-item h3 {
+        font-size: 36px;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-item::after {
+        display: none !important;
+    }
+}
+
+/* Market Insights Responsive Fix */
+@media (max-width: 992px) {
+    .insights-grid {
+        grid-template-columns: minmax(280px, 500px);
+        justify-content: center;
+    }
+}
+
+/* CTA Section Responsive Fix */
+@media (max-width: 768px) {
+    .cta-content h2 {
+        font-size: 28px;
+    }
+    
+    .cta-content p {
+        font-size: 16px;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        max-width: 240px;
+        margin: 0 auto;
+        gap: 15px;
+    }
+    
+    .cta-buttons .btn-primary,
+    .cta-buttons .btn-secondary {
+        width: 100%;
+    }
+}
+
+/* Contact Section Responsive Fix */
+@media (max-width: 992px) {
+    .contact-wrapper {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-info,
+    .contact-form {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-form {
+        padding: 25px 15px;
+    }
+    
+    .contact-info h2 {
+        font-size: 28px;
+    }
+}
+
+/* Extra Small Device Fixes */
+@media (max-width: 360px) {
+    .section-header h2 {
+        font-size: 24px;
+    }
+    
+    .section-header p {
+        font-size: 14px;
+    }
+    
+    .btn-primary, 
+    .btn-secondary {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    
+    .testimonial-item {
+        padding: 20px 15px;
+    }
+    
+    .testimonial-content {
+        font-size: 15px;
+    }
+}
+
+/* Fix for landscape orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+    #hero {
+        height: auto;
+        min-height: 450px;
+    }
+    
+    .hero-content h1 {
+        font-size: 28px;
+    }
+    
+    .hero-content p {
+        font-size: 16px;
+    }
+    
+    .hero-features {
+        display: none;
+    }
+}
+
+/* Improved Footer Responsiveness */
+@media (max-width: 992px) {
+    .footer-column h3 {
+        font-size: 22px;
+    }
+    
+    .footer-column h4 {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-content {
+        text-align: center;
+    }
+    
+    .footer-column h4::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .footer-column ul li a {
+        padding-left: 0;
+    }
+    
+    .footer-column ul li a::before {
+        display: none;
+    }
+    
+    .newsletter-form {
+        max-width: 280px;
+        margin: 0 auto 20px;
     }
 }
