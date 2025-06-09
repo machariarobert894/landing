@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update product details
         productName.textContent = product.name;
         productDescription.textContent = product.description;
-        productImage.innerHTML = `<i class="fas ${product.icon}"></i>`;
+        productImage.innerHTML = `<i class="fas ${product.icon} product-icon-${productId || defaultProduct}"></i>`;
         basePrice.textContent = `$${product.price.toFixed(2)}`;
         totalPrice.textContent = `$${product.price.toFixed(2)}`;
 

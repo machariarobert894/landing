@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - DerivLite</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="checkout.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="shortcut icon" href="https://image.freepik.com/free-vector/logo-design-with-statistics-concept_23-2147492184.jpg" type="image/x-icon">
+    <link rel="shortcut icon" href="images\icons\deriv lite logo.png" type="image/x-icon">
     <link rel="stylesheet" href="cookie-consent.css">
 </head>
 <body>
@@ -36,125 +37,151 @@
     <!-- Checkout Section -->
     <section id="checkout">
         <div class="container">
-            <div class="section-header">
-                <span class="section-tag">Secure Checkout</span>
-                <h2>Complete Your Purchase</h2>
-                <p>You're just a few steps away from owning your trading bot</p>
+            <div class="checkout-header">
+                <h1>Complete Your Order</h1>
+                <p>You're just moments away from elevating your trading</p>
+                <div class="checkout-steps">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Review</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step active">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Payment</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Confirmation</div>
+                    </div>
+                </div>
             </div>
 
             <div class="checkout-container">
+                <!-- Checkout Form -->
+                <div class="checkout-form-container">
+                    <div class="checkout-form">
+                        <h3>Your Information</h3>
+                        
+                        <form id="payment-form">
+                            <div class="form-section">
+                                <div class="form-group">
+                                    <label for="name">Full Name</label>
+                                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h4>Select Payment Method</h4>
+                                
+                                <div class="payment-options">
+                                    <div class="payment-option active" data-payment="binance">
+                                        <div class="payment-logo">
+                                            <img src="https://images.seeklogo.com/logo-png/32/1/binance-coin-bnb-logo-png_seeklogo-325081.png" alt="Binance Pay">
+                                        </div>
+                                        <div class="payment-info">
+                                            <h4>Binance Pay</h4>
+                                            <p>Fast and secure cryptocurrency payments</p>
+                                        </div>
+                                        <div class="payment-check">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="payment-option disabled" data-payment="card">
+                                        <div class="payment-logo">
+                                            <i class="fas fa-credit-card"></i>
+                                        </div>
+                                        <div class="payment-info">
+                                            <h4>Credit/Debit Card</h4>
+                                            <p>Coming soon</p>
+                                        </div>
+                                        <div class="payment-check">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-terms">
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox" id="terms" required>
+                                    <label for="terms">I agree to the <a href="terms-of-service.html">Terms & Conditions</a> and <a href="privacy-policy.html">Privacy Policy</a></label>
+                                </div>
+                            </div>
+
+                            <div class="secure-payment">
+                                <i class="fas fa-shield-alt"></i> Secure payment provided by Binance
+                            </div>
+
+                            <div class="form-buttons">
+                                <button type="button" id="pay-button" class="btn-primary">
+                                    <i class="fas fa-wallet"></i> Complete Purchase
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
                 <!-- Order Summary -->
                 <div class="order-summary">
-                    <h3>Order Summary</h3>
-                    <div class="product-selected">
-                        <div class="product-image" id="product-image">
-                            <i class="fas fa-robot"></i>
+                    <div class="order-card">
+                        <h3>Order Summary</h3>
+                        <div class="product-selected">
+                            <div class="product-image" id="product-image">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="product-details">
+                                <h4 id="product-name">Loading...</h4>
+                                <p id="product-description">Loading product details...</p>
+                            </div>
                         </div>
-                        <div class="product-details">
-                            <h4 id="product-name">Loading...</h4>
-                            <p id="product-description">Loading product details...</p>
+                        
+                        <div class="product-features-container">
+                            <h5>What's included:</h5>
                             <ul class="product-features" id="product-features">
                                 <!-- Features will be dynamically added here -->
                             </ul>
                         </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <div class="price-summary">
+                            <div class="price-row">
+                                <span>Base price:</span>
+                                <span id="base-price">$0.00</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Activation fee:</span>
+                                <span>$0.00</span>
+                            </div>
+                            <div class="price-row total">
+                                <span>Total:</span>
+                                <span id="total-price">$0.00</span>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="price-summary">
-                        <div class="price-row">
-                            <span>Base price:</span>
-                            <span id="base-price">$0.00</span>
+                    <!-- Product Reviews -->
+                    <div class="reviews-card">
+                        <div class="reviews-header">
+                            <h4><i class="fas fa-star"></i> Customer Reviews</h4>
+                            <div class="reviews-summary">
+                                <div class="rating-average">
+                                    <span id="average-rating">5.0</span>/5
+                                </div>
+                                <span>Based on <strong id="review-count">3</strong> reviews</span>
+                            </div>
                         </div>
-                        <div class="price-row">
-                            <span>Activation fee:</span>
-                            <span>$0.00</span>
-                        </div>
-                        <div class="price-row total">
-                            <span>Total:</span>
-                            <span id="total-price">$0.00</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Product Reviews (moved to bottom) -->
-                    <div class="product-reviews">
-                        <h4><i class="fas fa-star"></i> Verified Customer Reviews</h4>
-                        <div id="reviews-container">
+                        <div id="reviews-container" class="reviews-list">
                             <!-- Reviews will be dynamically added here -->
                         </div>
-                        <div class="reviews-summary">
-                            <div class="rating-average">
-                                <span id="average-rating">5.0</span>/5
-                            </div>
-                            <span>Based on <strong id="review-count">3</strong> reviews</span>
-                        </div>
                     </div>
-                </div>
-
-                <!-- Checkout Form -->
-                <div class="checkout-form">
-                    <h3>Your Information</h3>
-                    
-                    <form id="payment-form">
-                        <div class="form-section">
-                            <h4>Contact Information</h4>
-                            <div class="form-group">
-                                <label for="name">Full Name</label>
-                                <input type="text" id="name" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" required>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h4>Payment Method</h4>
-                            
-                            <div class="payment-options">
-                                <div class="payment-option active" data-payment="binance">
-                                    <div class="payment-logo">
-                                        <img src="https://images.seeklogo.com/logo-png/32/1/binance-coin-bnb-logo-png_seeklogo-325081.png" alt="Binance Pay">
-                                    </div>
-                                    <div class="payment-info">
-                                        <h4>Binance Pay</h4>
-                                        <p>Fast and secure cryptocurrency payments</p>
-                                    </div>
-                                    <div class="payment-check">
-                                        <i class="fas fa-check-circle"></i>
-                                    </div>
-                                </div>
-
-                                <div class="payment-option" data-payment="card">
-                                    <div class="payment-logo">
-                                        <i class="fas fa-credit-card"></i>
-                                    </div>
-                                    <div class="payment-info">
-                                        <h4>Credit/Debit Card</h4>
-                                        <p>Coming soon</p>
-                                    </div>
-                                    <div class="payment-check">
-                                        <i class="fas fa-check-circle"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-terms">
-                            <div class="checkbox-wrapper">
-                                <input type="checkbox" id="terms" required>
-                                <label for="terms">I agree to the <a href="terms-of-service.html">Terms & Conditions</a> and <a href="privacy-policy.html">Privacy Policy</a></label>
-                            </div>
-                        </div>
-
-                        <div class="secure-payment">
-                            <i class="fas fa-lock"></i> Your payment information is secure
-                        </div>
-
-                        <div class="form-buttons">
-                            <button type="button" id="pay-button" class="btn-primary">
-                                <i class="fas fa-wallet"></i> Pay with Binance Pay
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
 
@@ -162,7 +189,7 @@
             <div id="payment-modal" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>Processing Payment</h3>
+                        <h3>Complete Your Payment</h3>
                         <span class="close-modal">&times;</span>
                     </div>
                     <div class="modal-body">
@@ -172,7 +199,7 @@
                         </div>
                         <div id="payment-qr" style="display: none;">
                             <div class="binance-pay-brand">
-                                <img src="https://images.seeklogo.com/logo-png/32/1/tether-usdt-logo-png_seeklogo-323175.png" alt="Payment Gateway" class="binance-modal-logo">
+                                <img src="https://images.seeklogo.com/logo-png/32/1/binance-coin-bnb-logo-png_seeklogo-325081.png" alt="Payment Gateway" class="binance-modal-logo">
                             </div>
                             <div class="qr-code-wrapper">
                                 <img id="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=BinancePayDemo" alt="QR Code">
