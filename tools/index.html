@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIGIT//MATCH - Market Signal Tool</title>
+    <title>Digit Match Tool - DerivLite</title>
     <link rel="stylesheet" href="../css/tools.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="shortcut icon" href="images\icons\deriv lite logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/contact-disclaimer.css">
     <!-- PWA Manifest Link -->
     <link rel="manifest" href="manifest.json">
     <!-- Theme Color for PWA -->
@@ -456,19 +456,29 @@
                 <p class="channels-intro">For support, updates, and official content, please only use these verified channels:</p>
                 <ul class="social-links-list">
                     <li class="social-item">
+                        <i class="fa fa-envelope"></i>
+                        <span class="social-label">Email:</span>
+                        <a href="mailto:admin@derivlite.com">admin@derivlite.com</a>
+                    </li>
+                    <li class="social-item">
+                        <i class="fab fa-telegram"></i>
+                        <span class="social-label">Telegram:</span>
+                        <a href="https://t.me/deriv_insider" target="_blank">@deriv_insider</a>
+                    </li>
+                    <li class="social-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <span class="social-label">WhatsApp:</span>
+                        <a href="https://wa.me/254714653438" target="_blank">+254 714 653438</a>
+                    </li>
+                    <li class="social-item">
                         <i class="fab fa-instagram"></i>
                         <span class="social-label">Instagram:</span>
-                        <a href="https://www.instagram.com/derivlite.com_/" target="_blank" rel="noopener noreferrer">@derivlite.com_</a>
+                        <a href="https://instagram.com/derivlite.com_" target="_blank">@derivlite.com_</a>
                     </li>
                     <li class="social-item">
                         <i class="fab fa-tiktok"></i>
                         <span class="social-label">TikTok:</span>
-                        <a href="https://www.tiktok.com/@derivlite.com" target="_blank" rel="noopener noreferrer">@derivlite.com</a>
-                    </li>
-                    <li class="social-item">
-                        <i class="fas fa-phone-alt"></i>
-                        <span class="social-label">Support:</span>
-                        <a href="tel:+254714653438">+254714653438</a>
+                        <a href="https://www.tiktok.com/@derivlite.com" target="_blank">@derivlite.com</a>
                     </li>
                 </ul>
                 <p class="verification-note"><i class="fas fa-shield-alt"></i> Always verify you're using our official channels. We will never contact you from different accounts.</p>
@@ -609,6 +619,8 @@
     </div>
 
     <script src="../js/tools.js"></script>
+	<!-- inject contact disclaimer functionality -->
+    <script src="../js/contact-disclaimer.js"></script>
     <script>
         // Service Worker Registration
         if ('serviceWorker' in navigator) {
@@ -1877,7 +1889,7 @@
             });
 
             const evenOdd = analyzer.getEvenOddDistribution();
-            addLog(`[STATS] Even: ${evenOdd.even.toFixed(2)}% | Odd: ${evenOdd.odd.toFixed(2)}%`);
+            addLog(`[STATS] Even: ${evenOdd.even.toFixed(2)}% | Odd: ${evenOdd.toFixed(2)}%`);
 
             const streaks = analyzer.getStreaks();
             addLog(`[STATS] Max Streak: ${streaks.max} (digit repeating)`);
@@ -1891,7 +1903,7 @@
             const socket = {
                 readyState: 0,
                 reconnectAttempts: 0,
-                maxReconnectAttempts: 5,
+                maxReconnectAttempts:  5,
                 manualClose: false,
                 send: function(data) {
                     if (this.readyState !== 1) {
