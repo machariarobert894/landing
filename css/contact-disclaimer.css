@@ -334,7 +334,7 @@
     box-shadow: 0 2px 15px rgba(0, 196, 255, 0.4);
 }
 
-/* Responsive adjustments */
+/* Enhanced Responsive adjustments */
 @media (max-width: 576px) {
     .official-channels {
         grid-template-columns: 1fr;
@@ -348,6 +348,40 @@
     .disclaimer-header h3 {
         font-size: 16px;
     }
+    
+    /* Make contact popup more mobile-friendly */
+    .contact-disclaimer {
+        width: 90%;
+        right: 5%;
+        bottom: 70px;
+        max-width: 320px;
+    }
+    
+    .contact-disclaimer-trigger {
+        padding: 8px 14px;
+        font-size: 13px;
+        box-shadow: 0 2px 8px rgba(0, 255, 157, 0.35);
+        border-radius: 40px;
+    }
+    
+    .contact-disclaimer-body p {
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+    
+    .contact-channel {
+        padding: 7px 10px;
+        font-size: 13px;
+    }
+    
+    .disclaimer-text {
+        font-size: 11px;
+        padding: 8px;
+    }
+    
+    .contact-disclaimer-footer a {
+        font-size: 11px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -358,5 +392,58 @@
     .contact-disclaimer-trigger {
         padding: 8px 16px;
         font-size: 14px;
+    }
+    
+    /* Improve popup positioning for small devices */
+    .contact-disclaimer-overlay {
+        padding: 0 10px;
+    }
+    
+    .contact-disclaimer-popup {
+        width: 95%;
+        max-width: 420px;
+        max-height: 85vh;
+    }
+    
+    /* Make popup channels stack on mobile */
+    .official-channels {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .channel-item {
+        padding: 10px;
+    }
+}
+
+/* Handle very small screens */
+@media (max-width: 360px) {
+    .contact-disclaimer-trigger {
+        padding: 6px 10px;
+        font-size: 12px;
+        gap: 5px;
+    }
+    
+    .contact-disclaimer {
+        width: calc(100% - 20px);
+        right: 10px;
+        bottom: 60px;
+    }
+    
+    .contact-disclaimer-header {
+        padding: 8px 10px;
+    }
+    
+    .contact-disclaimer-header h3 {
+        font-size: 14px;
+    }
+    
+    .contact-disclaimer-body {
+        padding: 10px;
+    }
+    
+    .contact-channels {
+        gap: 6px;
     }
 }
