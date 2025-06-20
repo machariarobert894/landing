@@ -490,18 +490,66 @@
             
             <p class="disclaimer-note">By using this tool, you acknowledge and agree to this disclaimer.</p>
         </div>
-    </div>
-
-    <!-- Payment Modal -->
+    </div>    <!-- Payment Modal -->
     <div id="paymentOverlay" class="payment-overlay">
         <div class="payment-popup">
             <button id="closePaymentPopup" class="close-btn">&times;</button>
-            <h3><i class="fab fa-bitcoin"></i> Payment Request</h3>
-            <p class="payment-amount">Derivlite has requested <strong>250 USDT</strong> payment. Tap the link below to complete the payment via Binance:</p>
+            <h3><i class="fas fa-credit-card"></i> Payment Request</h3>
+            <p class="payment-amount">Derivlite has requested <strong>250 USDT</strong> payment. Choose your preferred payment method:</p>
             
-            <a href="https://s.binance.com/XwEaudt4" target="_blank" id="paymentLink" class="payment-link">
-                https://s.binance.com/R29up4mZ
-            </a>
+            <div class="payment-methods">
+                <h4>Select Payment Method</h4>
+                <div class="payment-options">
+                    <div class="payment-option active" data-payment="binance">
+                        <div class="payment-logo">
+                            <img src="https://images.seeklogo.com/logo-png/32/1/binance-coin-bnb-logo-png_seeklogo-325081.png" alt="Binance Pay">
+                        </div>
+                        <div class="payment-info">
+                            <h5>Binance Pay</h5>
+                            <p>Fast and secure cryptocurrency payments</p>
+                            <p class="payment-amount">250 USDT</p>
+                        </div>
+                        <div class="payment-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-option" data-payment="mpesa">
+                        <div class="payment-logo">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/512px-M-PESA_LOGO-01.svg.png" alt="M-Pesa">
+                        </div>
+                        <div class="payment-info">
+                            <h5>M-Pesa</h5>
+                            <p>Pay with M-Pesa mobile money</p>
+                            <p class="payment-amount">KSH 32,000</p>
+                        </div>
+                        <div class="payment-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Details for Binance -->
+            <div id="binanceDetails" class="payment-details active">
+                <h5>Complete payment via Binance Pay:</h5>
+                <a href="https://s.binance.com/XwEaudt4" target="_blank" id="paymentLink" class="payment-link">
+                    https://s.binance.com/R29up4mZ
+                </a>
+            </div>            <!-- Payment Details for M-Pesa -->
+            <div id="mpesaDetails" class="payment-details">
+                <h5>Send M-Pesa payment to:</h5>
+                <div style="background: var(--primary-bg); padding: 10px; border-radius: 3px; margin: 10px 0;">
+                    <p style="margin: 5px 0; color: var(--text-color);"><strong>Till Number:</strong> 5631416</p>
+                    <p style="margin: 5px 0; color: var(--text-color);"><strong>Amount:</strong> <span id="mpesaAmount">KSH 32,000</span></p>
+                </div>
+                <div style="background: var(--secondary-bg); padding: 8px; border-radius: 3px; margin: 10px 0; border-left: 3px solid var(--warning-color);">
+                    <p style="margin: 0; font-size: 12px; color: var(--muted-text);">
+                        <i class="fas fa-info-circle" style="color: var(--warning-color); margin-right: 5px;"></i>
+                        Use "Buy Goods and Services" option in M-Pesa
+                    </p>
+                </div>
+            </div>
             
             <!-- Discount code section -->
             <div class="discount-code-section">
@@ -778,21 +826,57 @@
 
                     const users = await fetchAllUsers();
 
-                    // Updated to use case-insensitive username matching
-                    const foundUser = users.find(user => 
-                        user.username_text.toLowerCase() === username.toLowerCase() && 
-                        user.password_text === password
-                    );
+                    // Updated to use case-insensitive username matching and map API fields
+                    const foundUser = users.find(user => {
+                        const apiUsername = (user.username_text || user.username);
+                        const apiPassword = (user.password_text || user.password);
+                        return apiUsername && apiUsername.toLowerCase() === username.toLowerCase() && apiPassword === password;
+                    });
 
-                    // Return the user object if found, otherwise null
-                    return foundUser ? {
-                        username: foundUser.username_text,
-                        role: foundUser.role || 'user',
-                        email: foundUser.email_text || '',
-                        inactive: foundUser.active_boolean === false,
-                        unique_id_text: foundUser.unique_id_text || null
-                    } : null;
-                    
+                    // Return the user object if found, otherwise try local JSON fallback
+                    if (foundUser) {
+                        const apiUsername = (foundUser.username_text || foundUser.username);
+                        const apiEmail = (foundUser.email_text || foundUser.email || '');
+                        // Determine inactive: for API active flag, active=false means inactive
+                        const apiInactive = (typeof foundUser.active_boolean !== 'undefined' ? !foundUser.active_boolean :
+                        typeof foundUser.active !== 'undefined' ? !foundUser.active : false);
+                        // Unique ID from 'unique id' or unique_id_text or unique_id
+                        const apiUnique = foundUser.unique_id_text || foundUser['unique id'] || foundUser.unique_id || null;
+                        return {
+                            username: apiUsername,
+                            role: foundUser.role || 'user',
+                            email: apiEmail,
+                            inactive: apiInactive,
+                            unique_id_text: apiUnique
+                        };
+                    } 
+                    // Local fallback for users.json or data/users.json
+                    const localFiles = ['../users.json', '../data/users.json'];
+                    for (const filePath of localFiles) {
+                        try {
+                            const resp = await fetch(filePath);
+                            if (resp.ok) {
+                                const localArr = await resp.json();
+                                const localUser = localArr.find(u => 
+                                    u.username.toLowerCase() === username.toLowerCase() && 
+                                    u.password === password
+                                );
+                                if (localUser) {
+                                    return {
+                                        username: localUser.username,
+                                        role: localUser.role || 'user',
+                                        email: localUser.email || '',
+                                        inactive: false,
+                                        unique_id_text: null
+                                    };
+                                }
+                            }
+                        } catch (e) {
+                            // continue to next fallback file
+                        }
+                    }
+                    // No matching user found
+                    return null;
                 } catch (error) {
                     console.error("Error checking login credentials via API:", error);
                     loginError.textContent = 'Login system error. Please try again later.';
@@ -828,12 +912,12 @@
                     const users = await fetchAllUsers();
                     
                     // Check if username exists (case-insensitive)
-                    if (users.some(user => user.username_text.toLowerCase() === username.toLowerCase())) {
+                    if (users.some(user => user.username_text && user.username_text.toLowerCase() === username.toLowerCase())) {
                         return { success: false, message: 'Username already exists' };
                     }
                     
                     // Check if email exists
-                    if (users.some(user => user.email_text.toLowerCase() === email.toLowerCase())) {
+                    if (users.some(user => user.email_text && user.email_text.toLowerCase() === email.toLowerCase())) {
                         return { success: false, message: 'Email already in use' };
                     }
                     
@@ -1716,30 +1800,88 @@
                 });
             });
             
+            // Payment method switching functionality
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            const binanceDetails = document.getElementById('binanceDetails');
+            const mpesaDetails = document.getElementById('mpesaDetails');
+            
+            // Handle payment method selection
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    paymentOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Get payment method
+                    const paymentMethod = this.getAttribute('data-payment');
+                    
+                    // Show appropriate payment details
+                    if (paymentMethod === 'binance') {
+                        binanceDetails.classList.add('active');
+                        mpesaDetails.classList.remove('active');
+                        addLog('[PAYMENT] Binance Pay selected', 'success');
+                    } else if (paymentMethod === 'mpesa') {
+                        binanceDetails.classList.remove('active');
+                        mpesaDetails.classList.add('active');
+                        addLog('[PAYMENT] M-Pesa selected', 'success');
+                    }
+                });
+            });
+
             // Discount code functionality
             const discountCodeInput = document.getElementById('discountCode');
             const applyDiscountBtn = document.getElementById('applyDiscountBtn');
             const discountMessage = document.getElementById('discountMessage');
             const paymentAmount = document.querySelector('.payment-amount');
-            const paymentLink = document.getElementById('paymentLink');
-
-            // Define discount codes
+            const paymentLink = document.getElementById('paymentLink');            // Define discount codes with both USDT and KSH amounts
             const discountCodes = {
                 'YBXCT': {
                     percentage: 30,
-                    amount: 175,
-                    link: 'https://s.binance.com/7zOgo0mM'
+                    usdtAmount: 175,
+                    kshAmount: 22400, // 175 * 128
+                    binanceLink: 'https://s.binance.com/7zOgo0mM'
                 },
                 'YIBVUIE': {
                     percentage: 50,
-                    amount: 125,
-                    link: 'https://s.binance.com/ZwLXdnob'
+                    usdtAmount: 125,
+                    kshAmount: 16000, // 125 * 128
+                    binanceLink: 'https://s.binance.com/ZwLXdnob'
                 }
             };
 
-            // Apply discount code handler
+            // Helper function to get active payment method
+            function getActivePaymentMethod() {
+                const activeOption = document.querySelector('.payment-option.active');
+                return activeOption ? activeOption.getAttribute('data-payment') : 'binance';
+            }
+
+            // Helper function to update payment amounts in options
+            function updatePaymentAmounts(discount = null) {
+                const binanceOption = document.querySelector('[data-payment="binance"] .payment-amount');
+                const mpesaOption = document.querySelector('[data-payment="mpesa"] .payment-amount');
+                
+                if (discount) {
+                    binanceOption.textContent = `${discount.usdtAmount} USDT`;
+                    mpesaOption.textContent = `KSH ${discount.kshAmount.toLocaleString()}`;
+                } else {
+                    binanceOption.textContent = '250 USDT';
+                    mpesaOption.textContent = 'KSH 32,000';
+                }
+            }
+
+            // Helper function to update M-Pesa details
+            function updateMpesaDetails(discount = null) {
+                const mpesaAmount = document.querySelector('#mpesaDetails .payment-amount, #mpesaDetails strong');
+                if (mpesaAmount) {
+                    const amount = discount ? discount.kshAmount.toLocaleString() : '32,000';
+                    mpesaAmount.textContent = `KSH ${amount}`;
+                }
+            }            // Apply discount code handler
             applyDiscountBtn.addEventListener('click', function() {
                 const code = discountCodeInput.value.trim().toUpperCase();
+                const activePaymentMethod = getActivePaymentMethod();
                 
                 // Reset styles
                 discountMessage.className = 'discount-message';
@@ -1753,10 +1895,23 @@
                 
                 const discount = discountCodes[code];
                 if (discount) {
-                    // Update payment amount and link
-                    paymentAmount.innerHTML = `Derivlite has requested <strong>${discount.amount} USDT</strong> payment (<span class="discount-applied">${discount.percentage}% discount applied</span>). Tap the link below to complete the payment via Binance:`;
-                    paymentLink.href = discount.link;
-                    paymentLink.textContent = discount.link;
+                    // Update payment amounts in both options
+                    updatePaymentAmounts(discount);
+                    
+                    // Update the main payment amount text
+                    if (activePaymentMethod === 'binance') {
+                        paymentAmount.innerHTML = `Derivlite has requested <strong>${discount.usdtAmount} USDT</strong> payment (<span class="discount-applied">${discount.percentage}% discount applied</span>). Choose your preferred payment method:`;
+                        paymentLink.href = discount.binanceLink;
+                        paymentLink.textContent = discount.binanceLink;
+                    } else {
+                        paymentAmount.innerHTML = `Derivlite has requested <strong>KSH ${discount.kshAmount.toLocaleString()}</strong> payment (<span class="discount-applied">${discount.percentage}% discount applied</span>). Choose your preferred payment method:`;
+                    }
+                    
+                    // Update M-Pesa amount
+                    const mpesaAmountEl = document.getElementById('mpesaAmount');
+                    if (mpesaAmountEl) {
+                        mpesaAmountEl.textContent = `KSH ${discount.kshAmount.toLocaleString()}`;
+                    }
                     
                     // Show success message
                     discountMessage.textContent = `${discount.percentage}% discount applied successfully!`;
@@ -1767,9 +1922,16 @@
                     addLog(`[PAYMENT] Discount code applied: ${code} (${discount.percentage}% off)`, 'success');
                 } else {
                     // Reset to original values
-                    paymentAmount.innerHTML = `Derivlite has requested <strong>250 USDT</strong> payment. Tap the link below to complete the payment via Binance:`;
+                    updatePaymentAmounts();
+                    paymentAmount.innerHTML = `Derivlite has requested <strong>250 USDT</strong> payment. Choose your preferred payment method:`;
                     paymentLink.href = 'https://s.binance.com/XwEaudt4';
                     paymentLink.textContent = 'https://s.binance.com/R29up4mZ';
+                    
+                    // Reset M-Pesa amount
+                    const mpesaAmountEl = document.getElementById('mpesaAmount');
+                    if (mpesaAmountEl) {
+                        mpesaAmountEl.textContent = 'KSH 32,000';
+                    }
                     
                     // Show error message
                     discountMessage.textContent = 'Invalid discount code. Please try again or contact support.';

@@ -3,7 +3,7 @@ const fs = require('fs').promises; // Use promise-based fs
 const path = require('path');
 
 const app = express();
-const port = 3000; // Port the server will listen on
+const port = process.env.PORT || 3000; // Port the server will listen on
 const usersFilePath = path.join(__dirname, 'users.json');
 const ADMIN_USERNAME = 'mikemuchiri1943@karatina'; // Define the admin username
 

@@ -80,14 +80,26 @@
                             <div class="form-section">
                                 <h4>Select Payment Method</h4>
                                 
-                                <div class="payment-options">
-                                    <div class="payment-option active" data-payment="binance">
+                                <div class="payment-options">                                    <div class="payment-option active" data-payment="binance">
                                         <div class="payment-logo">
                                             <img src="https://images.seeklogo.com/logo-png/32/1/binance-coin-bnb-logo-png_seeklogo-325081.png" alt="Binance Pay">
                                         </div>
                                         <div class="payment-info">
                                             <h4>Binance Pay</h4>
                                             <p>Fast and secure cryptocurrency payments</p>
+                                        </div>
+                                        <div class="payment-check">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="payment-option" data-payment="mpesa">
+                                        <div class="payment-logo">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/512px-M-PESA_LOGO-01.svg.png" alt="M-Pesa" style="width: 100%; height: 100%; object-fit: contain;">
+                                        </div>
+                                        <div class="payment-info">
+                                            <h4>M-Pesa</h4>
+                                            <p>Pay with M-Pesa mobile money</p>
                                         </div>
                                         <div class="payment-check">
                                             <i class="fas fa-check-circle"></i>
@@ -220,7 +232,89 @@
                             <h3>Payment Successful!</h3>
                             <p>Thank you for your purchase. You'll receive access to your bot shortly.</p>
                             <button id="continue-btn" class="btn-primary">Continue</button>
+                        </div>                        <div id="payment-mpesa" style="display: none;">
+                            <div class="mpesa-brand">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/512px-M-PESA_LOGO-01.svg.png" alt="M-Pesa" style="height: 50px; margin-bottom: 10px;">
+                            </div>
+                            <h3>Pay with M-Pesa</h3>
+                            <p style="margin: 4px 0 10px 0; font-size: 14px; color: #666;">USD to Kes conversion rate: 1:128</p>
+                            
+                            <!-- Payment Details Card -->
+                            <div class="mpesa-details" style="background: #f0f5ff; padding: 20px; margin: 15px 0; border-radius: 8px; border: 1px solid #d0e0ff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center;">
+                                <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+                                    <div style="background-color: #1a73e8; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                </div>
+                                <h4 style="margin: 0 0 10px 0; color: #333;">Payment Details</h4>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #d0e0ff;">
+                                    <span style="font-weight: 500; color: #666;">Business Name:</span>
+                                    <span style="font-weight: 600;">AgileHub Logistics</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #d0e0ff;">
+                                    <span style="font-weight: 500; color: #666;">Till Number:</span>
+                                    <span style="font-weight: 600; font-size: 18px; color: #1a73e8;">5631416</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #d0e0ff;">
+                                    <span style="font-weight: 500; color: #666;">Reference:</span>
+                                    <span style="font-weight: 600;" id="mpesa-account-display">BOT-00000</span>
+                                </div>                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="font-weight: 500; color: #666;">Amount:</span>
+                                    <span style="font-weight: 700; font-size: 18px; color: #1a73e8;" id="mpesa-amount-display" class="mpesa-dynamic-amount" data-kes-rate="128" data-base-price="250">Kes 32,000.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #d0e0ff; font-size: 12px;">
+                                    <span style="color: #666;">Rate:</span>
+                                    <span style="color: #666;">1 USD = 128 Kes</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mpesa-steps" style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+                                <h4 style="margin-top: 0; display: flex; align-items: center;">
+                                    <i class="fas fa-list-ol" style="color: #1a73e8; margin-right: 8px;"></i>
+                                    Follow These Steps
+                                </h4>
+                                <ol style="text-align: left; padding-left: 20px; margin: 0;">
+                                    <li style="margin-bottom: 8px;">Go to M-Pesa on your phone</li>
+                                    <li style="margin-bottom: 8px;">Select "Lipa na M-Pesa"</li>
+                                    <li style="margin-bottom: 8px;">Select "Buy Goods and Services"</li>
+                                    <li style="margin-bottom: 8px;">Enter Till Number: <strong style="color: #1a73e8;">5631416</strong></li>
+                                    <li style="margin-bottom: 8px;">Enter Amount: <strong style="color: #1a73e8;" id="mpesa-amount" class="mpesa-dynamic-amount" data-kes-rate="128" data-base-price="250">Kes 32,000.00</strong> <span id="mpesa-kes-amount" style="font-size: 12px; display: block; color: #666; margin-top: 2px;">(USD $250.00)</span></li>
+                                    <li style="margin-bottom: 8px;">Enter your M-Pesa PIN</li>
+                                    <li style="margin-bottom: 8px;">Confirm payment</li>
+                                </ol>
+                            </div>
+                              
+                            <div class="whatsapp-verification" style="margin: 15px 0; padding: 15px; background-color: #dcf8c6; border-radius: 8px; border: 1px solid #a5d6a7;">
+                                <h4 style="margin-top: 0; display: flex; align-items: center; color: #1b5e20;">
+                                    <i class="fab fa-whatsapp" style="color: #25d366; margin-right: 8px; font-size: 20px;"></i>
+                                    Verify Your Payment
+                                </h4>
+                                <p style="margin: 0 0 10px 0;">
+                                    After payment, please forward the M-Pesa confirmation SMS to:
+                                </p>
+                                <div style="background: white; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 10px;">
+                                    <a href="https://wa.me/254714653438" style="display: flex; align-items: center; justify-content: center; text-decoration: none; color: #25d366; font-weight: 700; font-size: 18px;">
+                                        <i class="fab fa-whatsapp" style="margin-right: 5px;"></i>
+                                        +254 714 653438
+                                    </a>
+                                </div>
+                                <p style="margin: 0; font-size: 14px;">
+                                    Include your <strong>reference number</strong> in your WhatsApp message for faster processing.
+                                </p>
+                            </div>
+                            
+                            <p class="countdown" style="text-align: center; font-weight: 500; color: #64748b; margin: 15px 0;">
+                                <i class="fas fa-clock" style="color: #1a73e8; margin-right: 5px;"></i>
+                                Complete payment within <span id="mpesa-countdown" style="font-weight: 700; color: #1a73e8;">10:00</span>
+                            </p>
+                            
+                            <div class="mpesa-confirmation" style="margin-top: 20px; text-align: center;">
+                                <button id="mpesa-confirm-btn" class="btn-primary" style="padding: 12px 24px; width: 100%; max-width: 250px;">
+                                    <i class="fas fa-check"></i> I've Made Payment
+                                </button>
+                            </div>
                         </div>
+                        
                         <div id="payment-error" style="display: none;">
                             <div class="error-icon">
                                 <i class="fas fa-exclamation-circle"></i>
@@ -264,11 +358,11 @@
                         <li><a href="privacy-policy.html">Privacy Policy</a></li>
                         <li><a href="#">Refund Policy</a></li>
                     </ul>
-                </div>
-                <div class="footer-column">
+                </div>                <div class="footer-column">
                     <h4>Payment Methods</h4>
                     <div class="payment-methods">
                         <img src="https://images.seeklogo.com/logo-png/32/1/binance-coin-bnb-logo-png_seeklogo-325081.png" alt="Binance Pay" height="40">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/512px-M-PESA_LOGO-01.svg.png" alt="M-Pesa" height="40" style="margin-left: 10px;">
                     </div>
                 </div>
             </div>
@@ -296,5 +390,32 @@
     <script src="checkout.js"></script>
     <script src="cookie-consent.js"></script>
     <script src="js/contact-disclaimer.js"></script>
+    <!-- Direct M-Pesa Amount Initialization Script -->
+    <script>
+        // Initialize M-Pesa amounts as soon as DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set defaults for M-Pesa amounts
+            const mpesaAmounts = document.querySelectorAll('#mpesa-amount, #mpesa-amount-display');
+            const kesRate = 128;
+            const basePrice = 250;
+            const kesAmount = (basePrice * kesRate).toFixed(2);
+            const formattedAmount = kesAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            
+            // Update all relevant elements
+            mpesaAmounts.forEach(function(el) {
+                if (el) {
+                    el.textContent = `Kes ${formattedAmount}`;
+                }
+            });
+            
+            // Set USD equivalent
+            const mpesaKesAmount = document.getElementById('mpesa-kes-amount');
+            if (mpesaKesAmount) {
+                mpesaKesAmount.textContent = `(USD $${basePrice.toFixed(2)})`;
+            }
+            
+            console.log('M-Pesa amounts initialized with static values');
+        });
+    </script>
 </body>
 </html>

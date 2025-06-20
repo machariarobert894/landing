@@ -147,20 +147,35 @@
 .payment-option {
     display: flex;
     align-items: center;
-    padding: 15px;
+    padding: 18px;
     border: 2px solid #e2e8f0;
     border-radius: var(--border-radius);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    position: relative;
+    overflow: hidden;
 }
 
 .payment-option:hover {
+    transform: translateY(-2px);
     border-color: #cbd5e0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
 .payment-option.active {
     border-color: var(--primary-color);
     background-color: rgba(66, 153, 225, 0.05);
+}
+
+.payment-option.active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background-color: var(--primary-color);
 }
 
 .payment-option.disabled {
@@ -169,15 +184,16 @@
 }
 
 .payment-logo {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-right: 15px;
     background-color: #f8fafc;
-    border-radius: 8px;
-    padding: 5px;
+    border-radius: 12px;
+    padding: 8px;
+    transition: all 0.3s ease;
 }
 
 .payment-logo img, .payment-logo i {
@@ -196,9 +212,11 @@
 }
 
 .payment-info h4 {
-    font-size: 16px;
+    font-size: 17px;
     margin: 0 0 5px;
     color: var(--dark-color);
+    transition: all 0.3s ease;
+    font-weight: 600;
 }
 
 .payment-info p {
@@ -207,15 +225,26 @@
     margin: 0;
 }
 
+.payment-option:hover .payment-info h4 {
+    color: var(--primary-color);
+}
+
 .payment-check {
     color: var(--primary-color);
-    font-size: 20px;
+    font-size: 22px;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .payment-option.active .payment-check {
     opacity: 1;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
 }
 
 /* Form Terms */
@@ -251,17 +280,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f7fafc;
-    padding: 12px;
+    background-color: #f0f9ff;
+    padding: 14px;
     border-radius: var(--border-radius);
     margin-bottom: 20px;
     color: #2d3748;
     font-size: 14px;
+    border: 1px solid #e0f2fe;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+}
+
+.secure-payment:hover {
+    background-color: #e0f2fe;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
 }
 
 .secure-payment i {
-    margin-right: 8px;
-    color: #10b981;
+    margin-right: 10px;
+    color: #0284c7;
+    font-size: 16px;
 }
 
 /* Form Buttons */
@@ -520,6 +558,8 @@
 
 .modal-body {
     padding: 35px 30px;
+    max-height: 500px; /* Limit height for better scrolling */
+    overflow-y: auto;
 }
 
 /* Payment Processing */
@@ -532,16 +572,37 @@
 
 .loader {
     border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left-color: var(--primary-color);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
+    position: relative;
+    animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.loader::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(0.95); opacity: 1; }
+    50% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(0.95); opacity: 1; }
 }
 
 #payment-processing p {
@@ -549,6 +610,14 @@
     font-weight: 500;
     color: var(--dark-color);
     text-align: center;
+    max-width: 280px;
+    line-height: 1.5;
+    animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Payment QR Section */
@@ -721,6 +790,116 @@
     width: auto;
 }
 
+/* M-Pesa Payment */
+#payment-mpesa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.mpesa-brand {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mpesa-brand img {
+    height: 50px;
+    transition: all 0.3s ease;
+}
+
+.mpesa-steps {
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.mpesa-steps h4 {
+    color: #1a73e8;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.mpesa-steps ol {
+    margin: 0;
+    padding-left: 25px;
+}
+
+.mpesa-steps ol li {
+    margin-bottom: 12px;
+    line-height: 1.6;
+    color: var(--text-color);
+    position: relative;
+}
+
+.mpesa-details {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.whatsapp-verification {
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.whatsapp-verification h4 {
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.whatsapp-verification a {
+    transition: all 0.3s ease;
+}
+
+.whatsapp-verification a:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.mpesa-confirmation {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#mpesa-confirm-btn {
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#mpesa-confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.countdown {
+    font-size: 16px;
+    color: #64748b;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#mpesa-countdown {
+    font-weight: 700;
+    color: #1a73e8;
+    margin-left: 5px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .checkout-container {
@@ -746,5 +925,72 @@
     #qr-code {
         width: 150px;
         height: 150px;
+    }
+    
+    /* Responsive M-Pesa Styling */
+    #payment-mpesa {
+        padding: 0 10px;
+    }
+    
+    .mpesa-brand img {
+        height: 40px;
+    }
+    
+    .mpesa-details > div {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 5px;
+        padding-bottom: 10px;
+    }
+    
+    .mpesa-steps h4,
+    .whatsapp-verification h4 {
+        font-size: 16px;
+    }
+    
+    .mpesa-steps ol li {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    
+    .whatsapp-verification p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        max-width: 95%;
+        padding: 15px;
+    }
+    
+    .modal-header h3 {
+        font-size: 18px;
+    }
+    
+    #payment-mpesa {
+        padding: 0;
+    }
+    
+    .mpesa-details {
+        padding: 15px;
+    }
+    
+    .mpesa-steps {
+        padding: 15px !important; 
+    }
+    
+    .whatsapp-verification {
+        padding: 12px !important;
+    }
+    
+    .mpesa-brand img {
+        height: 35px;
+    }
+    
+    #mpesa-confirm-btn {
+        padding: 12px 20px;
+        font-size: 15px;
     }
 }

@@ -124,10 +124,26 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (paymentStatus === 'cancel') {
         showPaymentError();
         paymentModal.classList.add('show');
+    }    // Select product based on URL parameter or default
+    let selectedProduct = products[productId] || products[defaultProduct];
+    
+    // Ensure we always have a valid product with a price
+    if (!selectedProduct || typeof selectedProduct.price !== 'number') {
+        console.warn('Invalid product or price, falling back to default product');
+        selectedProduct = products[defaultProduct];
+        
+        // If even the default product is invalid, create a backup product
+        if (!selectedProduct || typeof selectedProduct.price !== 'number') {
+            selectedProduct = {
+                name: 'Precision Hunter',
+                price: 250,
+                description: 'Tactical bot that hunts down optimal entry points',
+                icon: 'fa-robot',
+                binanceLink: 'https://s.binance.com/LDIzxZqD',
+                features: ['Advanced trend detection', 'Automated stop losses']
+            };
+        }
     }
-
-    // Select product based on URL parameter or default
-    const selectedProduct = products[productId] || products[defaultProduct];
 
     // Update product information in the UI
     function updateProductUI(product) {
@@ -192,21 +208,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize with the selected product
-    updateProductUI(selectedProduct);
-
-    // Payment option selection
+    updateProductUI(selectedProduct);    // Payment option selection
+    let selectedPaymentMethod = 'binance'; // Default payment method
+    
     paymentOptions.forEach(option => {
         option.addEventListener('click', function() {
-            // Only allow selecting Binance Pay for now
-            if (this.dataset.payment === 'binance') {
-                paymentOptions.forEach(opt => opt.classList.remove('active'));
-                this.classList.add('active');
+            const paymentMethod = this.dataset.payment;
+            
+            // Skip disabled payment methods
+            if (this.classList.contains('disabled')) {
+                return;
+            }
+            
+            // Update active payment method
+            paymentOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            selectedPaymentMethod = paymentMethod;
+              // Update payment button text
+            if (paymentMethod === 'binance') {
                 payButton.innerHTML = `<i class="fas fa-wallet"></i> Pay $${selectedProduct.price.toFixed(2)} with Binance Pay`;
+                document.querySelector('.secure-payment').innerHTML = `<i class="fas fa-shield-alt"></i> Secure payment provided by Binance`;            } else if (paymentMethod === 'mpesa') {
+                const kesRate = 128; 
+                const productPrice = selectedProduct.price || 250; // Default to 250 if price is undefined
+                const kesAmount = (productPrice * kesRate).toFixed(2);
+                const formattedKesAmount = kesAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                
+                payButton.innerHTML = `<i class="fas fa-mobile-alt"></i> Pay Kes ${formattedKesAmount} with M-Pesa`;
+                document.querySelector('.secure-payment').innerHTML = `<i class="fas fa-shield-alt"></i> Secure mobile money payment via M-Pesa (1 USD = 128 Kes)`;
             }
         });
-    });
-
-    // Pay button click handler
+    });    // Pay button click handler
     payButton.addEventListener('click', function() {
         // Form validation
         const nameInput = document.getElementById('name');
@@ -233,35 +264,116 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show payment modal
         paymentModal.classList.add('show');
         
-        // Get binance pay link for the selected product
-        const paymentLink = selectedProduct.binanceLink;
+        // Generate a unique order ID (timestamp + random numbers)
+        const orderId = new Date().getTime().toString().slice(-6) + Math.floor(Math.random() * 1000);
         
-        // Simulate payment processing
-        setTimeout(() => {
-            document.getElementById('payment-processing').style.display = 'none';
-            document.getElementById('payment-qr').style.display = 'flex';
+        // Process payment based on selected method
+        if (selectedPaymentMethod === 'binance') {
+            // Get binance pay link for the selected product
+            const paymentLink = selectedProduct.binanceLink;
+              // Update modal content to say we're connecting to Binance
+            document.getElementById('payment-processing').querySelector('p').innerHTML = '<i class="fab fa-bitcoin" style="color: #f0b90b; margin-right: 8px;"></i> Connecting to Binance Pay...';
             
-            // Update the QR code with the specific Binance Pay link
-            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentLink)}`;
+            // Simulate payment processing
+            setTimeout(() => {
+                document.getElementById('payment-processing').style.display = 'none';
+                document.getElementById('payment-qr').style.display = 'flex';
+                document.getElementById('payment-mpesa').style.display = 'none';
+                
+                // Update the QR code with the specific Binance Pay link
+                document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentLink)}`;
+                
+                // Add direct payment link option
+                const paymentLinks = document.getElementById('payment-links');
+                if (!paymentLinks) {
+                    const qrSection = document.getElementById('payment-qr');
+                    const newPaymentLinks = document.createElement('div');
+                    newPaymentLinks.id = 'payment-links';
+                    qrSection.appendChild(newPaymentLinks);
+                }
+                document.getElementById('payment-links').innerHTML = `
+                    <p class="payment-note">Scan the QR code with your Binance app or click the button below</p>
+                    <a href="${paymentLink}" target="_blank" class="btn-secondary btn-sm">
+                        <i class="fas fa-external-link-alt"></i> Open Binance Pay
+                    </a>
+                    <p class="payment-amount">Amount: ${selectedProduct.price} USDT</p>`;
+                
+                // Start countdown
+                startCountdown('countdown');
+            }, 2000);
+        } else if (selectedPaymentMethod === 'mpesa') {            // Update modal content to say we're preparing M-Pesa payment
+            document.getElementById('payment-processing').querySelector('p').innerHTML = '<i class="fas fa-mobile-alt" style="color: #1a73e8; margin-right: 8px;"></i> Preparing M-Pesa payment instructions...';
             
-            // Add direct payment link option
-            const paymentLinks = document.getElementById('payment-links');
-            if (!paymentLinks) {
-                const qrSection = document.getElementById('payment-qr');
-                const newPaymentLinks = document.createElement('div');
-                newPaymentLinks.id = 'payment-links';
-                qrSection.appendChild(newPaymentLinks);
-            }
-            document.getElementById('payment-links').innerHTML = `
-                <p class="payment-note">Scan the QR code with your Binance app or click the button below</p>
-                <a href="${paymentLink}" target="_blank" class="btn-secondary btn-sm">
-                    <i class="fas fa-external-link-alt"></i> Open Binance Pay
-                </a>
-                <p class="payment-amount">Amount: ${selectedProduct.price} USDT</p>`;
-            
-            // Start countdown
-            startCountdown();
-        }, 2000);
+            // Simulate payment processing
+            setTimeout(() => {                document.getElementById('payment-processing').style.display = 'none';
+                document.getElementById('payment-qr').style.display = 'none';
+                document.getElementById('payment-mpesa').style.display = 'block';
+                
+                // Force UI update to ensure amounts are shown
+                updateMpesaAmounts();
+                  
+                // Update M-Pesa payment details
+                const productCode = productId || defaultProduct;
+                document.getElementById('mpesa-id').textContent = orderId;
+                document.getElementById('mpesa-account-display').textContent = `BOT-${orderId}`;
+                
+                // Convert USD to Kenyan Shillings (KES) at rate of 1:128
+                const kesRate = 128;
+                const productPrice = selectedProduct.price || 250; // Default to 250 if price is undefined
+                const kesAmount = (productPrice * kesRate).toFixed(2);
+                
+                // Format the amounts with thousand separators
+                const formattedKesAmount = kesAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                  // Check if elements exist before updating them
+                console.log('Updating M-Pesa amounts:', {
+                    productPrice,
+                    kesAmount,
+                    formattedKesAmount
+                });
+                
+                // Get references to all elements that need updating
+                const mpesaAmount = document.getElementById('mpesa-amount');
+                const mpesaAmountDisplay = document.getElementById('mpesa-amount-display');
+                const mpesaKesAmount = document.getElementById('mpesa-kes-amount');
+                
+                // Check if elements exist and update with error handling
+                if (mpesaAmount) {
+                    mpesaAmount.textContent = `Kes ${formattedKesAmount}`;
+                    console.log('Updated mpesa-amount:', mpesaAmount.textContent);
+                } else {
+                    console.error('Error: mpesa-amount element not found!');
+                }
+                
+                if (mpesaAmountDisplay) {
+                    mpesaAmountDisplay.textContent = `Kes ${formattedKesAmount}`;
+                    console.log('Updated mpesa-amount-display:', mpesaAmountDisplay.textContent);
+                } else {
+                    console.error('Error: mpesa-amount-display element not found!');
+                }
+                
+                if (mpesaKesAmount) {
+                    mpesaKesAmount.textContent = `(USD $${productPrice.toFixed(2)})`;
+                    console.log('Updated mpesa-kes-amount:', mpesaKesAmount.textContent);
+                } else {
+                    console.error('Error: mpesa-kes-amount element not found!');
+                }
+                
+                // Add a direct update to the elements by trying an alternative approach
+                try {
+                    document.querySelector('#mpesa-amount').innerHTML = `Kes ${formattedKesAmount}`;
+                    document.querySelector('#mpesa-amount-display').innerHTML = `Kes ${formattedKesAmount}`;
+                } catch (e) {
+                    console.error('Error using querySelector:', e);
+                }
+                // Start countdown for M-Pesa
+                startCountdown('mpesa-countdown');
+                
+                // Add event listener for M-Pesa confirmation button
+                document.getElementById('mpesa-confirm-btn').addEventListener('click', function() {
+                    showPaymentSuccess();
+                });
+            }, 2000);
+        }
     });
 
     // Close modal button
@@ -282,46 +394,66 @@ document.addEventListener('DOMContentLoaded', function() {
     continueBtn.addEventListener('click', function() {
         window.location.href = 'index.html';
     });
-    
-    // Retry button after failed payment
+      // Retry button after failed payment
     retryBtn.addEventListener('click', function() {
         resetPaymentState();
         document.getElementById('payment-processing').style.display = 'flex';
+        
+        // Update retry process according to selected payment method
         setTimeout(() => {
             document.getElementById('payment-processing').style.display = 'none';
-            document.getElementById('payment-qr').style.display = 'flex';
             
-            // Update the QR code with the selected product's payment link
-            const paymentLink = selectedProduct.binanceLink;
-            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentLink)}`;
-            
-            // Update the payment links
-            const paymentLinks = document.getElementById('payment-links');
-            if (!paymentLinks) {
-                const qrSection = document.getElementById('payment-qr');
-                const newPaymentLinks = document.createElement('div');
-                newPaymentLinks.id = 'payment-links';
-                qrSection.appendChild(newPaymentLinks);
+            if (selectedPaymentMethod === 'binance') {
+                document.getElementById('payment-qr').style.display = 'flex';
+                document.getElementById('payment-mpesa').style.display = 'none';
+                
+                // Update the QR code with the selected product's payment link
+                const paymentLink = selectedProduct.binanceLink;
+                document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paymentLink)}`;
+                
+                // Update the payment links
+                const paymentLinks = document.getElementById('payment-links');
+                if (!paymentLinks) {
+                    const qrSection = document.getElementById('payment-qr');
+                    const newPaymentLinks = document.createElement('div');
+                    newPaymentLinks.id = 'payment-links';
+                    qrSection.appendChild(newPaymentLinks);
+                }
+                document.getElementById('payment-links').innerHTML = `
+                    <p class="payment-note">Scan the QR code with your Binance app or click the button below</p>
+                    <a href="${paymentLink}" target="_blank" class="btn-secondary btn-sm">
+                        <i class="fas fa-external-link-alt"></i> Open Binance Pay
+                    </a>
+                    <p class="payment-amount">Amount: ${selectedProduct.price} USDT</p>`;
+                
+                startCountdown('countdown');
+            } else if (selectedPaymentMethod === 'mpesa') {
+                document.getElementById('payment-qr').style.display = 'none';
+                document.getElementById('payment-mpesa').style.display = 'block';
+                
+                // Generate a new order ID
+                const orderId = new Date().getTime().toString().slice(-6) + Math.floor(Math.random() * 1000);
+                
+                // Update M-Pesa payment details
+                document.getElementById('mpesa-id').textContent = orderId;
+                document.getElementById('mpesa-account-display').textContent = `BOT-${orderId}`;
+                
+                // Force update M-Pesa amounts
+                updateMpesaAmounts();
+                
+                // Start countdown for M-Pesa
+                startCountdown('mpesa-countdown');
             }
-            document.getElementById('payment-links').innerHTML = `
-                <p class="payment-note">Scan the QR code with your Binance app or click the button below</p>
-                <a href="${paymentLink}" target="_blank" class="btn-secondary btn-sm">
-                    <i class="fas fa-external-link-alt"></i> Open Binance Pay
-                </a>
-                <p class="payment-amount">Amount: ${selectedProduct.price} USDT</p>`;
-            
-            startCountdown();
         }, 1500);
     });
-    
-    // Countdown timer for payment window
-    function startCountdown() {
+      // Countdown timer for payment window
+    function startCountdown(elementId) {
         let timeLeft = 600; // 10 minutes
         
         function updateCountdown() {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
-            document.getElementById('countdown').textContent = 
+            document.getElementById(elementId).textContent = 
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
             if (timeLeft <= 0) {
@@ -334,33 +466,129 @@ document.addEventListener('DOMContentLoaded', function() {
         
         updateCountdown();
         const countdownInterval = setInterval(updateCountdown, 1000);
-        window.countdownInterval = countdownInterval; // Store for cleanup
+        
+        // Store the interval ID for cleanup
+        if (!window.countdownIntervals) {
+            window.countdownIntervals = {};
+        }
+        window.countdownIntervals[elementId] = countdownInterval;
     }
-    
-    // Show payment success UI
+      // Show payment success UI
     function showPaymentSuccess() {
+        // Clear all countdown intervals
+        if (window.countdownIntervals) {
+            Object.values(window.countdownIntervals).forEach(interval => {
+                clearInterval(interval);
+            });
+        }
         if (window.countdownInterval) clearInterval(window.countdownInterval);
+        
         document.getElementById('payment-processing').style.display = 'none';
         document.getElementById('payment-qr').style.display = 'none';
+        document.getElementById('payment-mpesa').style.display = 'none';
         document.getElementById('payment-error').style.display = 'none';
         document.getElementById('payment-success').style.display = 'flex';
     }
     
     // Show payment error UI
     function showPaymentError() {
+        // Clear all countdown intervals
+        if (window.countdownIntervals) {
+            Object.values(window.countdownIntervals).forEach(interval => {
+                clearInterval(interval);
+            });
+        }
         if (window.countdownInterval) clearInterval(window.countdownInterval);
+        
         document.getElementById('payment-processing').style.display = 'none';
         document.getElementById('payment-qr').style.display = 'none';
+        document.getElementById('payment-mpesa').style.display = 'none';
         document.getElementById('payment-success').style.display = 'none';
         document.getElementById('payment-error').style.display = 'flex';
     }
     
     // Reset payment state
     function resetPaymentState() {
+        // Clear all countdown intervals
+        if (window.countdownIntervals) {
+            Object.values(window.countdownIntervals).forEach(interval => {
+                clearInterval(interval);
+            });
+            window.countdownIntervals = {};
+        }
         if (window.countdownInterval) clearInterval(window.countdownInterval);
-        document.getElementById('payment-processing').style.display = 'flex';
+          document.getElementById('payment-processing').style.display = 'flex';
         document.getElementById('payment-qr').style.display = 'none';
+        document.getElementById('payment-mpesa').style.display = 'none';
         document.getElementById('payment-success').style.display = 'none';
         document.getElementById('payment-error').style.display = 'none';
     }
+    
+    // Add a function to update M-Pesa amounts in the UI directly
+    function updateMpesaAmounts() {
+        // Wait a bit for the DOM to fully render
+        setTimeout(() => {
+            try {
+                const productPrice = selectedProduct.price || 250;
+                const kesRate = 128;
+                const kesAmount = (productPrice * kesRate).toFixed(2);
+                const formattedKesAmount = kesAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                
+                console.log('Force-updating M-Pesa amounts with:', {
+                    productPrice,
+                    kesAmount,
+                    formattedKesAmount
+                });
+                
+                // Direct DOM manipulation
+                const elements = [
+                    document.getElementById('mpesa-amount'),
+                    document.getElementById('mpesa-amount-display')
+                ];
+                
+                elements.forEach(el => {
+                    if (el) {
+                        console.log(`Element ${el.id} before update: ${el.textContent}`);
+                        el.textContent = `Kes ${formattedKesAmount}`;
+                        el.innerHTML = `Kes ${formattedKesAmount}`;
+                        console.log(`Element ${el.id} after update: ${el.textContent}`);
+                    }
+                });
+                
+                const kesAmountEl = document.getElementById('mpesa-kes-amount');
+                if (kesAmountEl) {
+                    kesAmountEl.textContent = `(USD $${productPrice.toFixed(2)})`;
+                }
+            } catch (err) {
+                console.error('Error in updateMpesaAmounts:', err);
+            }
+        }, 500);
+    }
+    
+    // Initialize dynamic M-Pesa amount elements that have default values in HTML
+    function initDynamicMpesaElements() {
+        const dynamicElements = document.querySelectorAll('.mpesa-dynamic-amount');
+        
+        dynamicElements.forEach(el => {
+            const kesRate = parseFloat(el.dataset.kesRate || 128);
+            const basePrice = parseFloat(el.dataset.basePrice || 250);
+            const kesAmount = (basePrice * kesRate).toFixed(2);
+            const formattedKesAmount = kesAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            
+            // Set initial values
+            if (el.id === 'mpesa-amount' || el.id === 'mpesa-amount-display') {
+                el.textContent = `Kes ${formattedKesAmount}`;
+            }
+        });
+        
+        // Also set the USD equivalent
+        const kesAmountEl = document.getElementById('mpesa-kes-amount');
+        if (kesAmountEl) {
+            const basePrice = 250; // Default value
+            kesAmountEl.textContent = `(USD $${basePrice.toFixed(2)})`;
+        }
+    }
+    
+    // Call this on page load
+    initDynamicMpesaElements();
 });
