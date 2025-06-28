@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Trading Over/Under Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="smart-trading-container">
+        <!-- Enhanced Over/Under Analysis Components will be injected here by React -->
+        
+        <!-- Template for Over/Under Analysis Display -->
+        <div class="over-under-analysis-template" style="display: none;">
+            <div class="barrier-display">
+                <label>Analysis Barrier:</label>
+                <input type="number" class="barrier-input" min="0" max="9" value="5">
+                <span class="barrier-explanation">Digits 0-4 = Under, 5 = Equals, 6-9 = Over</span>
+            </div>
+            
+            <div class="over-under-bars">
+                <div class="probability-bar">
+                    <div class="probability-bar__header">
+                        <span>Over</span>
+                        <span class="percentage">33.33%</span>
+                    </div>
+                    <div class="probability-bar__container">
+                        <div class="probability-bar__fill probability-bar__fill--over" style="width: 33.33%">
+                            33.33%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="probability-bar">
+                    <div class="probability-bar__header">
+                        <span>Under</span>
+                        <span class="percentage">33.33%</span>
+                    </div>
+                    <div class="probability-bar__container">
+                        <div class="probability-bar__fill probability-bar__fill--under" style="width: 33.33%">
+                            33.33%
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="digit-frequency">
+                <h4>Digit Frequency Distribution</h4>
+                <div class="digit-grid">
+                    <!-- Digits 0-9 will be populated here -->
+                </div>
+            </div>
+            
+            <div class="pattern-analysis">
+                <div class="pattern-strength">
+                    <span>Pattern Strength:</span>
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: 0%"></div>
+                    </div>
+                    <span class="strength-value">0%</span>
+                </div>
+            </div>
+            
+            <div class="hot-cold-digits">
+                <div class="hot-digits">
+                    <div>🔥 Hot Digits</div>
+                    <div class="digit-chips">
+                        <!-- Hot digits will be populated here -->
+                    </div>
+                </div>
+                <div class="cold-digits">
+                    <div>❄️ Cold Digits</div>
+                    <div class="digit-chips">
+                        <!-- Cold digits will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analysis Scripts -->
+    <script src="script.js"></script>
+    
+    <script>
+        // Initialize the analysis system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Over/Under Analysis System ready');
+            
+            // Example of how to trigger analysis updates
+            function updateAnalysisDisplay() {
+                if (window.overUnderAnalyzer) {
+                    const analysis = window.overUnderAnalyzer.analyzeOverUnder(5, 120);
+                    console.log('Over/Under Analysis Result:', analysis);
+                    
+                    // The React component will handle the actual display updates
+                    window.postMessage({
+                        type: 'OVER_UNDER_ANALYSIS_UPDATE',
+                        data: analysis
+                    }, '*');
+                }
+            }
+            
+            // Update analysis every 2 seconds
+            setInterval(updateAnalysisDisplay, 2000);
+        });
+    </script>
+</body>
+</html>

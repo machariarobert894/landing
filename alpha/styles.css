@@ -1,0 +1,437 @@
+/* Enhanced Over/Under Analysis Styles */
+.over-under-analysis {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+}
+
+.barrier-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    background: #fff;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.barrier-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.barrier-input-container label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+.barrier-input {
+    width: 60px;
+    padding: 8px 12px;
+    border: 2px solid #ced4da;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.barrier-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.barrier-explanation {
+    font-size: 12px;
+    color: #6c757d;
+    text-align: center;
+    margin-top: 4px;
+}
+
+/* Over/Under Probability Bars */
+.over-under-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.probability-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.probability-bar__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.probability-bar__container {
+    height: 24px;
+    background: #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+.probability-bar__fill {
+    height: 100%;
+    border-radius: 12px;
+    transition: width 0.5s ease, background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.probability-bar__fill--over {
+    background: linear-gradient(45deg, #28a745, #20c997);
+}
+
+.probability-bar__fill--under {
+    background: linear-gradient(45deg, #dc3545, #fd7e14);
+}
+
+.probability-bar__fill--equals {
+    background: linear-gradient(45deg, #6f42c1, #e83e8c);
+}
+
+/* Digit Frequency Grid */
+.digit-frequency {
+    margin: 16px 0;
+}
+
+.digit-frequency h4 {
+    margin-bottom: 12px;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.digit-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.digit-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    border-radius: 6px;
+    font-size: 12px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.digit-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.digit-box.over {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border-color: #28a745;
+}
+
+.digit-box.under {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    border-color: #dc3545;
+}
+
+.digit-box.equal {
+    background: linear-gradient(135deg, #e2e3f5, #d1d3f4);
+    border-color: #6f42c1;
+}
+
+.digit-value {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.digit-freq {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* Pattern Analysis */
+.pattern-analysis {
+    padding: 12px;
+    background: #fff;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+.pattern-strength {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.strength-bar {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.strength-fill {
+    height: 100%;
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    transition: width 0.5s ease;
+}
+
+/* Streak Indicator */
+.streak-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+
+.streak-count {
+    font-weight: bold;
+    color: #856404;
+    margin-left: 4px;
+}
+
+/* Trading Condition Enhancements for Over/Under */
+.over-under-condition {
+    border-left: 4px solid #17a2b8;
+}
+
+.condition-barrier-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.barrier-input-small {
+    width: 50px;
+    padding: 4px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.trading-barrier-input {
+    width: 50px;
+    padding: 4px 8px;
+    border: 2px solid #17a2b8;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+    background: #e7f7ff;
+}
+
+.trading-barrier-input:focus {
+    outline: none;
+    border-color: #138496;
+    box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.1);
+}
+
+/* Hot/Cold Digits Indicator */
+.hot-cold-digits {
+    display: flex;
+    justify-content: space-between;
+    margin: 12px 0;
+    gap: 16px;
+}
+
+.hot-digits, .cold-digits {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.hot-digits {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border: 1px solid #ffeaa7;
+}
+
+.cold-digits {
+    background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+    border: 1px solid #bee5eb;
+}
+
+.digit-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.digit-chip {
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.digit-chip--hot {
+    background: #ffc107;
+    color: #212529;
+}
+
+.digit-chip--cold {
+    background: #17a2b8;
+    color: white;
+}
+
+/* Trend Analysis */
+.trend-analysis {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #6c757d;
+}
+
+.trend-arrow {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.trend-arrow--up {
+    color: #28a745;
+}
+
+.trend-arrow--down {
+    color: #dc3545;
+}
+
+.trend-arrow--neutral {
+    color: #6c757d;
+}
+
+/* Volatility Indicator */
+.volatility-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.volatility-indicator--low {
+    background: #d4edda;
+    color: #155724;
+}
+
+.volatility-indicator--medium {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.volatility-indicator--high {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Pattern Display for over-under-2 */
+.digit-sequence {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 8px 0;
+}
+
+.digit-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 12px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.digit-label sub {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    font-size: 8px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .over-under-bars {
+        grid-template-columns: 1fr;
+    }
+    
+    .digit-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+    }
+    
+    .hot-cold-digits {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .condition-barrier-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Animation for value changes */
+@keyframes valueUpdate {
+    0% { background-color: rgba(255, 193, 7, 0.3); }
+    100% { background-color: transparent; }
+}
+
+.probability-bar__fill.updated {
+    animation: valueUpdate 0.5s ease;
+}
+
+.digit-box.updated {
+    animation: valueUpdate 0.5s ease;
+}
