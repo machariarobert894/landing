@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="channel-icon"><i class="fab fa-whatsapp"></i></div>
                             <div class="channel-details">
                                 <h4>WhatsApp</h4>
-                                <p><a href="https://wa.me/254714653438" target="_blank">+254714653438</a></p>
+                                <p><a href="https://wa.me/254759440187" target="_blank">+254759440187</a></p>
                             </div>
                         </div>
                         <div class="channel-item">
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <a href="mailto:admin@derivlite.com" class="contact-channel">
                             <i class="fas fa-envelope"></i> Email Support
                         </a>
-                        <a href="https://wa.me/254714653438" class="contact-channel" target="_blank">
+                        <a href="https://wa.me/254759440187" class="contact-channel" target="_blank">
                             <i class="fab fa-whatsapp"></i> WhatsApp Support
                         </a>
                         <a href="https://instagram.com/derivlite.com_" class="contact-channel" target="_blank">

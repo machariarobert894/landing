@@ -3,106 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Trading Over/Under Analysis</title>
+    <title>Over/Under Analysis Tool</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="smart-trading-container">
-        <!-- Enhanced Over/Under Analysis Components will be injected here by React -->
-        
-        <!-- Template for Over/Under Analysis Display -->
-        <div class="over-under-analysis-template" style="display: none;">
-            <div class="barrier-display">
-                <label>Analysis Barrier:</label>
-                <input type="number" class="barrier-input" min="0" max="9" value="5">
-                <span class="barrier-explanation">Digits 0-4 = Under, 5 = Equals, 6-9 = Over</span>
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="auth-header">
+                <h2>Login to Over/Under Analysis</h2>
+                <p>Connect your trading account to access advanced analysis</p>
             </div>
-            
-            <div class="over-under-bars">
-                <div class="probability-bar">
-                    <div class="probability-bar__header">
-                        <span>Over</span>
-                        <span class="percentage">33.33%</span>
-                    </div>
-                    <div class="probability-bar__container">
-                        <div class="probability-bar__fill probability-bar__fill--over" style="width: 33.33%">
-                            33.33%
-                        </div>
-                    </div>
+            <form id="authForm">
+                <div class="input-group">
+                    <label for="token">API Token</label>
+                    <input type="password" id="token" placeholder="Enter your API token" required>
                 </div>
-                
-                <div class="probability-bar">
-                    <div class="probability-bar__header">
-                        <span>Under</span>
-                        <span class="percentage">33.33%</span>
-                    </div>
-                    <div class="probability-bar__container">
-                        <div class="probability-bar__fill probability-bar__fill--under" style="width: 33.33%">
-                            33.33%
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="digit-frequency">
-                <h4>Digit Frequency Distribution</h4>
-                <div class="digit-grid">
-                    <!-- Digits 0-9 will be populated here -->
-                </div>
-            </div>
-            
-            <div class="pattern-analysis">
-                <div class="pattern-strength">
-                    <span>Pattern Strength:</span>
-                    <div class="strength-bar">
-                        <div class="strength-fill" style="width: 0%"></div>
-                    </div>
-                    <span class="strength-value">0%</span>
-                </div>
-            </div>
-            
-            <div class="hot-cold-digits">
-                <div class="hot-digits">
-                    <div>🔥 Hot Digits</div>
-                    <div class="digit-chips">
-                        <!-- Hot digits will be populated here -->
-                    </div>
-                </div>
-                <div class="cold-digits">
-                    <div>❄️ Cold Digits</div>
-                    <div class="digit-chips">
-                        <!-- Cold digits will be populated here -->
-                    </div>
-                </div>
+                <button type="submit" id="loginBtn">Connect & Analyze</button>
+            </form>
+            <div class="auth-help">
+                <p>Don't have an API token? <a href="https://app.deriv.com/account/api-token" target="_blank">Get one here</a></p>
             </div>
         </div>
     </div>
-    
-    <!-- Analysis Scripts -->
+
+    <!-- Main Application -->
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Over/Under Analysis Tool</h1>
+                <div class="user-info">
+                    <span id="userName">Loading...</span>
+                    <button id="logoutBtn" class="logout-btn">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <label for="symbolSelect">Symbol</label>
+                        <select id="symbolSelect">
+                            <option value="R_10">Volatility 10 Index</option>
+                            <option value="R_25">Volatility 25 Index</option>
+                            <option value="R_50">Volatility 50 Index</option>
+                            <option value="R_75">Volatility 75 Index</option>
+                            <option value="R_100">Volatility 100 Index</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="barrierValue">Barrier</label>
+                        <input type="number" id="barrierValue" min="0" max="9" value="5">
+                    </div>
+                    <div class="control-item">
+                        <label for="analysisDepth">Analysis Depth</label>
+                        <input type="number" id="analysisDepth" min="10" max="1000" value="100">
+                    </div>
+                    <div class="control-item">
+                        <label for="refreshRate">Refresh Rate (ms)</label>
+                        <input type="number" id="refreshRate" min="1000" max="10000" value="2000">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Dashboard -->
+            <section class="analysis-dashboard">
+                <div class="dashboard-grid">
+                    <!-- Live Price Card -->
+                    <div class="analysis-card price-card">
+                        <h3>Live Price</h3>
+                        <div class="price-display">
+                            <span id="currentPrice">--</span>
+                            <span id="lastDigit" class="last-digit">-</span>
+                        </div>
+                        <div class="price-change" id="priceChange">--</div>
+                    </div>
+
+                    <!-- Over/Under Probability -->
+                    <div class="analysis-card probability-card">
+                        <h3>Over/Under Probability</h3>
+                        <div class="probability-bars">
+                            <div class="prob-bar over-bar">
+                                <span class="label">Over <span id="barrierDisplay">5</span></span>
+                                <div class="bar">
+                                    <div class="fill" id="overProbBar"></div>
+                                    <span class="value" id="overProbValue">50%</span>
+                                </div>
+                            </div>
+                            <div class="prob-bar under-bar">
+                                <span class="label">Under <span id="barrierDisplay2">5</span></span>
+                                <div class="bar">
+                                    <div class="fill" id="underProbBar"></div>
+                                    <span class="value" id="underProbValue">50%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pattern Analysis -->
+                    <div class="analysis-card pattern-card">
+                        <h3>Recent Pattern</h3>
+                        <div class="digit-sequence" id="digitSequence"></div>
+                        <div class="pattern-stats">
+                            <div class="stat">
+                                <span class="stat-label">Streak:</span>
+                                <span id="currentStreak">-</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Type:</span>
+                                <span id="streakType">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trading Signals -->
+                    <div class="analysis-card signals-card">
+                        <h3>Trading Signals</h3>
+                        <div class="signal-indicators">
+                            <div class="signal" id="overSignal">
+                                <span class="signal-type">OVER</span>
+                                <span class="signal-strength">--</span>
+                            </div>
+                            <div class="signal" id="underSignal">
+                                <span class="signal-type">UNDER</span>
+                                <span class="signal-strength">--</span>
+                            </div>
+                        </div>
+                        <div class="recommendation" id="recommendation">
+                            Analyzing...
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trading Interface -->
+            <section class="trading-interface">
+                <div class="trading-card">
+                    <h3>Trading Controls</h3>
+                    <div class="trading-form">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="stakeAmount">Stake Amount</label>
+                                <input type="number" id="stakeAmount" min="0.35" step="0.01" value="1.00">
+                            </div>
+                            <div class="input-group">
+                                <label for="duration">Duration (ticks)</label>
+                                <input type="number" id="duration" min="1" max="10" value="1">
+                            </div>
+                            <div class="input-group">
+                                <label for="tradingBarrier">Trading Barrier</label>
+                                <input type="number" id="tradingBarrier" min="0" max="9" value="5">
+                            </div>
+                        </div>
+                        <div class="button-row">
+                            <button id="buyOverBtn" class="trade-btn over-btn">BUY OVER</button>
+                            <button id="buyUnderBtn" class="trade-btn under-btn">BUY UNDER</button>
+                        </div>
+                        <div class="auto-trading">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="autoTradingToggle">
+                                <span class="slider"></span>
+                                Auto Trading
+                            </label>
+                            <div class="auto-settings">
+                                <label for="autoThreshold">Signal Threshold: <span id="thresholdValue">70</span>%</label>
+                                <input type="range" id="autoThreshold" min="60" max="90" value="70">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics -->
+            <section class="statistics-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Digit Distribution</h4>
+                        <div class="digit-chart" id="digitChart"></div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Trading History</h4>
+                        <div class="trade-history" id="tradeHistory">
+                            <p>No trades yet</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Performance</h4>
+                        <div class="performance-metrics">
+                            <div class="metric">
+                                <span class="metric-label">Total Trades:</span>
+                                <span id="totalTrades">0</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Win Rate:</span>
+                                <span id="winRate">0%</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Profit/Loss:</span>
+                                <span id="profitLoss">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status">
+        <span id="statusText">Disconnected</span>
+        <div id="statusIndicator" class="status-indicator"></div>
+    </div>
+
     <script src="script.js"></script>
-    
-    <script>
-        // Initialize the analysis system when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Over/Under Analysis System ready');
-            
-            // Example of how to trigger analysis updates
-            function updateAnalysisDisplay() {
-                if (window.overUnderAnalyzer) {
-                    const analysis = window.overUnderAnalyzer.analyzeOverUnder(5, 120);
-                    console.log('Over/Under Analysis Result:', analysis);
-                    
-                    // The React component will handle the actual display updates
-                    window.postMessage({
-                        type: 'OVER_UNDER_ANALYSIS_UPDATE',
-                        data: analysis
-                    }, '*');
-                }
-            }
-            
-            // Update analysis every 2 seconds
-            setInterval(updateAnalysisDisplay, 2000);
-        });
-    </script>
+</body>
+</html>
+        <span id="statusText">Disconnected</span>
+        <div id="statusIndicator" class="status-indicator"></div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
