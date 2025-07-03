@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="channel-icon"><i class="fab fa-telegram"></i></div>
                             <div class="channel-details">
                                 <h4>Telegram</h4>
-                                <p><a href="https://t.me/deriv_insider" target="_blank">@deriv_insider</a></p>
+                                <p><a href="https://t.me/binary_blueprint" target="_blank">@binary_blueprint</a></p>
                             </div>
                         </div>
                         <div class="channel-item">
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="contact-disclaimer-body">
                     <p>Have questions or need assistance? Contact our support team:</p>
                     <div class="contact-channels">
-                        <a href="https://t.me/deriv_insider" class="contact-channel" target="_blank">
+                        <a href="https://t.me/binary_blueprint" class="contact-channel" target="_blank">
                             <i class="fab fa-telegram"></i> Telegram Support
                         </a>
                         <a href="mailto:admin@derivlite.com" class="contact-channel">
