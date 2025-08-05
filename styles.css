@@ -1,19 +1,13 @@
-/* Base Styles */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/* Minimal Base Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary-color: #6366f1; /* Updated to a purple/indigo that fits fintech */
-    --primary-dark: #4f46e5;
-    --primary-light: #e0e7ff;
-    --secondary-color: #14b8a6; /* A teal accent color for fintech feel */
-    --dark-color: #1e293b;
-    --text-color: #475569;
-    --light-color: #f8fafc;
+    --primary-color: #000;
+    --text-color: #333;
+    --light-gray: #f5f5f5;
+    --border-color: #e5e5e5;
     --white: #ffffff;
-    --border-radius: 8px;
-    --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    --hover-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-    --transition: all 0.3s ease;
+    --transition: all 0.2s ease;
 }
 
 * {
