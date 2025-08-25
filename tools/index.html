@@ -34,6 +34,61 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
+        /* Login Button Styles */
+        .login-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            margin-left: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .login-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        /* User Section Styles */
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: 20px;
+        }
+        
+        .user-welcome {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
         /* Trading iFrame Container - MODIFIED for better responsive sizing */
         .trade-iframe-container {
             display: none;
@@ -567,6 +622,13 @@
     <div class="container">
         <header class="main-header">
             <div class="logo">DIGIT<span class="accent">//</span>MATCH</div>
+            <!-- User Account Section -->
+            <div id="userSection" class="user-section" style="display: none;">
+                <span id="userWelcome" class="user-welcome"></span>
+                <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+            <!-- Login Button (shown when not logged in) -->
+            <button id="loginButton" class="login-button"><i class="fas fa-sign-in-alt"></i> Login</button>
             <!-- Admin Panel Link Placeholder -->
             <a href="#" id="adminLink" class="admin-link"><i class="fas fa-user-shield"></i> Admin Panel</a>
             <!-- Trade Button -->
@@ -723,6 +785,12 @@
             const registerForm = document.getElementById('registerForm');
             const loginError = document.getElementById('loginError');
             const registerError = document.getElementById('registerError');
+            
+            // Header Login Elements
+            const loginButton = document.getElementById('loginButton');
+            const userSection = document.getElementById('userSection');
+            const userWelcome = document.getElementById('userWelcome');
+            const logoutBtn = document.getElementById('logoutBtn');
 
             // Disclaimer Modal Elements
             const disclaimerLink = document.getElementById('disclaimerLink');
@@ -782,6 +850,79 @@
                 });
             }
 
+            // Login Button Logic
+            if (loginButton) {
+                loginButton.addEventListener('click', function() {
+                    loginOverlay.style.display = 'flex';
+                    // Switch to login tab
+                    loginTabBtn.click();
+                });
+            }
+
+            // Logout Button Logic
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    // Clear user session
+                    localStorage.removeItem('currentUser');
+                    
+                    // Clean up any remaining unique ID data
+                    const keys = Object.keys(localStorage);
+                    keys.forEach(key => {
+                        if (key.startsWith('userUniqueId')) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                    
+                    // Update UI
+                    updateUserInterface(null);
+                    
+                    // Log the logout
+                    addLog('[AUTH] User logged out successfully', 'info');
+                });
+            }
+
+            // Function to update user interface based on login state
+            function updateUserInterface(user) {
+                if (user) {
+                    // User is logged in
+                    loginButton.style.display = 'none';
+                    userSection.style.display = 'flex';
+                    userWelcome.textContent = `Welcome, ${user.username}`;
+                    
+                    // Update admin link visibility based on role
+                    if (adminLink) {
+                        adminLink.style.display = (user.role === 'admin') ? 'inline-flex' : 'none';
+                    }
+                } else {
+                    // User is logged out
+                    loginButton.style.display = 'flex';
+                    userSection.style.display = 'none';
+                    
+                    // Hide admin link
+                    if (adminLink) {
+                        adminLink.style.display = 'none';
+                    }
+                }
+            }
+
+            // Check for existing user session on page load
+            function checkExistingSession() {
+                try {
+                    const currentUser = localStorage.getItem('currentUser');
+                    if (currentUser) {
+                        const user = JSON.parse(currentUser);
+                        updateUserInterface(user);
+                        addLog(`[AUTH] Session restored for user: ${user.username}`, 'info');
+                    }
+                } catch (error) {
+                    console.error('Error checking existing session:', error);
+                    localStorage.removeItem('currentUser');
+                }
+            }
+
+            // Call session check on page load
+            checkExistingSession();
+
             // Tab switching functionality
             loginTabBtn.addEventListener('click', function() {
                 loginTabBtn.classList.add('active');
@@ -797,26 +938,59 @@
                 loginFormContainer.classList.remove('active');
             });
 
-            // Check login function - Updated for case-insensitive username matching
+            // Check login function - Using local users.json file as primary source
             async function checkLogin(username, password) {
                 try {
-                    // Fix the API URL (removing the space and using correct endpoint)
+                    // First, try to load users from local data/users.json file
+                    const localFiles = ['../data/users.json', '../users.json'];
+                    for (const filePath of localFiles) {
+                        try {
+                            console.log(`Attempting to load users from: ${filePath}`);
+                            const resp = await fetch(filePath);
+                            if (resp.ok) {
+                                const localArr = await resp.json();
+                                console.log('Loaded users from local file:', localArr);
+                                
+                                // Check if user exists in local file
+                                const localUser = localArr.find(u => 
+                                    u.username && u.username.toLowerCase() === username.toLowerCase() && 
+                                    u.password === password
+                                );
+                                
+                                if (localUser) {
+                                    console.log('User found in local file:', localUser.username);
+                                    // Check if account is inactive
+                                    if (localUser.status === 'inactive') {
+                                        loginError.textContent = 'Your account is currently inactive. Please contact support.';
+                                        return null;
+                                    }
+                                    
+                                    return {
+                                        username: localUser.username,
+                                        role: localUser.role || 'user',
+                                        email: localUser.email || '',
+                                        inactive: localUser.status === 'inactive',
+                                        created_at: localUser.created_at,
+                                        last_login: new Date().toISOString() // Update last login
+                                    };
+                                }
+                            }
+                        } catch (e) {
+                            console.log(`Could not load from ${filePath}:`, e.message);
+                        }
+                    }
+                    
+                    // Fallback to API if local file doesn't work
+                    console.log('Falling back to API authentication...');
                     const apiUrl = 'https://app.binaryfx.site/api/1.1/obj/derivlite_users';
                     
                     const response = await fetch(apiUrl);
 
                     if (!response.ok) {
-                        let errorBody = "Could not retrieve error body.";
-                        try {
-                            errorBody = await response.text();
-                        } catch (e) { /* ignore */ }
-                        console.error(`API error! status: ${response.status}, body: ${errorBody}`);
+                        console.error(`API error! status: ${response.status}`);
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
-
-                    // Log the API response for debugging
-                    console.log('API Response:', data);
 
                     if (!data.response || !data.response.results) {
                         console.error("Unexpected API response structure:", data);
@@ -826,73 +1000,38 @@
 
                     const users = await fetchAllUsers();
 
-                    // Updated to use case-insensitive username matching and map API fields
+                    // Check API users
                     const foundUser = users.find(user => {
                         const apiUsername = (user.username_text || user.username);
                         const apiPassword = (user.password_text || user.password);
                         return apiUsername && apiUsername.toLowerCase() === username.toLowerCase() && apiPassword === password;
                     });
 
-                    // Return the user object if found, otherwise try local JSON fallback
                     if (foundUser) {
                         const apiUsername = (foundUser.username_text || foundUser.username);
                         const apiEmail = (foundUser.email_text || foundUser.email || '');
-                        // Determine inactive: for API active flag, active=false means inactive
                         const apiInactive = (typeof foundUser.active_boolean !== 'undefined' ? !foundUser.active_boolean :
                         typeof foundUser.active !== 'undefined' ? !foundUser.active : false);
-                        // Unique ID from 'unique id' or unique_id_text or unique_id
-                        const apiUnique = foundUser.unique_id_text || foundUser['unique id'] || foundUser.unique_id || null;
                         return {
                             username: apiUsername,
                             role: foundUser.role || 'user',
                             email: apiEmail,
-                            inactive: apiInactive,
-                            unique_id_text: apiUnique
+                            inactive: apiInactive
                         };
-                    } 
-                    // Local fallback for users.json or data/users.json
-                    const localFiles = ['../users.json', '../data/users.json'];
-                    for (const filePath of localFiles) {
-                        try {
-                            const resp = await fetch(filePath);
-                            if (resp.ok) {
-                                const localArr = await resp.json();
-                                const localUser = localArr.find(u => 
-                                    u.username.toLowerCase() === username.toLowerCase() && 
-                                    u.password === password
-                                );
-                                if (localUser) {
-                                    return {
-                                        username: localUser.username,
-                                        role: localUser.role || 'user',
-                                        email: localUser.email || '',
-                                        inactive: false,
-                                        unique_id_text: null
-                                    };
-                                }
-                            }
-                        } catch (e) {
-                            // continue to next fallback file
-                        }
                     }
-                    // No matching user found
+                    
+                    // No matching user found anywhere
+                    console.log('No matching user found in local or API sources');
                     return null;
                 } catch (error) {
-                    console.error("Error checking login credentials via API:", error);
+                    console.error("Error checking login credentials:", error);
                     loginError.textContent = 'Login system error. Please try again later.';
                     return null;
                 }
             }
 
-            // Function to generate unique 12-digit ID
-            function generateUniqueId() {
-                const timestamp = new Date().getTime().toString().slice(-10);
-                const random = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-                return timestamp + random;
-            }
-
             // Register new user function - Updated for case-insensitive username checking
-            async function registerUser(username, email, password, uniqueId) {
+            async function registerUser(username, email, password) {
                 try {
                     // First check if the username or email already exists using the login API
                     const apiUrl = 'https://app.binaryfx.site/api/1.1/obj/derivlite_users';
@@ -933,7 +1072,6 @@
                                 username: username,
                                 email: email,
                                 password: password,
-                                unique_id: uniqueId,
                                 registration_source: 'web_app',
                                 registration_time: new Date().toISOString()
                             })
@@ -1035,19 +1173,12 @@
                     return;
                 }
 
-                // Generate unique ID and store in localStorage with username as part of key
-                const uniqueId = generateUniqueId();
-                const uniqueIdKey = 'userUniqueId_' + username.toLowerCase();
-                localStorage.setItem(uniqueIdKey, uniqueId);
-                
-                addLog(`[SYSTEM] Generated unique ID for registration: ${uniqueId} (stored as ${uniqueIdKey})`);
-
                 const registerButton = this.querySelector('.btn-register');
                 const originalButtonText = registerButton.innerHTML;
                 registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
                 registerButton.disabled = true;
 
-                const registerResult = await registerUser(username, email, password, uniqueId);
+                const registerResult = await registerUser(username, email, password);
 
                 registerButton.innerHTML = originalButtonText;
                 registerButton.disabled = false;
@@ -1107,67 +1238,16 @@
                         // Log the inactive account attempt
                         addLog(`[ACCESS] Login attempt by inactive account: ${loginResult.username}`, 'alert');
                     } 
-                    // Check if unique_id_text exists in the user record and in localStorage
-                    else if (loginResult.unique_id_text) {
-                        // Check for username-specific unique ID first
-                        const uniqueIdKey = 'userUniqueId_' + username.toLowerCase();
-                        let storedUniqueId = localStorage.getItem(uniqueIdKey);
-                        
-                        // Fallback: Check legacy format (for backward compatibility)
-                        if (!storedUniqueId) {
-                            storedUniqueId = localStorage.getItem('userUniqueId');
-                            
-                            // If found in old format, migrate to new format
-                            if (storedUniqueId && storedUniqueId === loginResult.unique_id_text) {
-                                localStorage.setItem(uniqueIdKey, storedUniqueId);
-                                addLog(`[SYSTEM] Migrated legacy unique ID to username-specific storage for ${username}`);
-                            }
-                        }
-                        
-                        // Just check if IDs match, no editing
-                        if (storedUniqueId !== loginResult.unique_id_text) {
-                            // Update the payment popup content for device restriction error
-                            const paymentTitle = paymentOverlay.querySelector('h3');
-                            const paymentText = paymentOverlay.querySelectorAll('p');
-                            const paymentLink = paymentOverlay.querySelector('.payment-link');
-                            
-                            paymentTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Device Restriction';
-                            paymentText[0].innerHTML = `Your account <strong>${loginResult.username}</strong> is already in use on another device.`;
-                            
-                            // Hide the payment link for device restriction errors
-                            paymentLink.style.display = 'none';
-                            
-                            paymentText[1].innerHTML = 'Please use the same device you used to create this account to access this tool. Each account is restricted to a single device for security reasons.';
-                            
-                            // Show the payment popup directly
-                            paymentOverlay.style.display = 'flex';
-                            
-                            // Add an error in the login form as well
-                            loginError.textContent = 'This account is already in use in another device.';
-                            loginError.style.color = '#ff5252';
-                            
-                            // Log the access attempt
-                            addLog(`[ACCESS] Login attempt from unauthorized device for account: ${loginResult.username}`, 'alert');
-                            return;
-                        }
-                        
-                        // Active account with valid device - proceed with login
-                        loginOverlay.style.display = 'none';
-                        sessionStorage.setItem('loggedInUser', loginResult.username);
-
-                        if (loginResult.role === 'admin') {
-                            adminLink.style.display = 'inline-flex';
-                            adminLink.href = '../admin/admin.html';
-                        } else {
-                            adminLink.style.display = 'none';
-                        }
-
-                        initializeTool();
-                    } 
                     else {
-                        // Legacy account without unique_id_text - proceed with login
+                        // Active account - proceed with login
                         loginOverlay.style.display = 'none';
                         sessionStorage.setItem('loggedInUser', loginResult.username);
+                        
+                        // Save user session for persistent login
+                        localStorage.setItem('currentUser', JSON.stringify(loginResult));
+                        
+                        // Update UI to show logged in state
+                        updateUserInterface(loginResult);
 
                         if (loginResult.role === 'admin') {
                             adminLink.style.display = 'inline-flex';
